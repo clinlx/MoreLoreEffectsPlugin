@@ -1,0 +1,6 @@
+org\clinlx\moreloreeffectsplugins\EffectValueChange.class
+org\clinlx\moreloreeffectsplugins\PlayerEffectsState.class
+org\clinlx\moreloreeffectsplugins\MoreLoreEffectsPlugin.class
+org\clinlx\moreloreeffectsplugins\Tools.class
+org\clinlx\moreloreeffectsplugins\SkillInfo.class
+org\clinlx\moreloreeffectsplugins\EventsListener.class

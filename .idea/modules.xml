@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/FirstPlugins.iml" filepath="$PROJECT_DIR$/FirstPlugins.iml" />
+      <module fileurl="file://$PROJECT_DIR$/MoreLoreEffectsPlugin.iml" filepath="$PROJECT_DIR$/MoreLoreEffectsPlugin.iml" />
+    </modules>
+  </component>
+</project>
