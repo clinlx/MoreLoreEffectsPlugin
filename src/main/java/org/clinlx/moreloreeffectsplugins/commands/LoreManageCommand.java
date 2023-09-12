@@ -41,19 +41,19 @@ public class LoreManageCommand extends BaseCommand {
         }
         if (args[0].equals("add")) {
             if (args.length == 3) {
-                if (ListLoreCommand.getLoreList().contains(args[1])) {
-                    String LoreWord = Tools.decodeColorChar(args[1]);
-                    String LoreValue = Tools.decodeColorChar(args[2]);
-                    ItemMeta itemMeta = mainHand.getItemMeta();
-                    List<String> lores = itemMeta.getLore();
-                    if (lores == null) lores = new ArrayList<>();
-                    lores.add(LoreWord + ": " + LoreValue);
-                    itemMeta.setLore(lores);
-                    mainHand.setItemMeta(itemMeta);
-                    player.sendMessage("§a已将Lore词条§6" + LoreWord + "§a添加到物品");
-                } else {
-                    player.sendMessage("§4Lore词条不存在");
-                }
+//                if (ListLoreCommand.getLoreList().contains(args[1])) {
+                String LoreWord = Tools.decodeColorChar(args[1]);
+                String LoreValue = Tools.decodeColorChar(args[2]);
+                ItemMeta itemMeta = mainHand.getItemMeta();
+                List<String> lores = itemMeta.getLore();
+                if (lores == null) lores = new ArrayList<>();
+                lores.add(LoreWord + ": " + LoreValue);
+                itemMeta.setLore(lores);
+                mainHand.setItemMeta(itemMeta);
+                player.sendMessage("§a已将Lore词条§6" + LoreWord + "§a添加到物品");
+//                } else {
+//                    player.sendMessage("§4Lore词条不存在");
+//                }
                 return true;
             } else
                 return false;

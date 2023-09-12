@@ -57,6 +57,7 @@ public class Tools {
             List<String> lorelist = fromItem.getItemMeta().getLore();
             //查询词条
             for (String theLore : lorelist) {
+                theLore = theLore.replaceAll("(§k [\\S\\s]+§l )", "");
                 String result = Tools.filterColorChar(theLore);
                 String[] parts = result.split(":");
                 if (parts.length != 2) continue;
