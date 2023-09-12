@@ -7,15 +7,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Tools {
-    
+
     public static String filterColorChar(String input) {
         return input.replaceAll("(§[a-zA-Z0-9])", "");
     }
-    
+
     public static String filterDescChar(String input) {
         return input.replaceAll("(&[a-zA-Z0-9])|(\\(.*\\))|%", "");
     }
-    
+
+    public static String decodeColorChar(String input) {
+        input = input.replaceAll("(&([&a-zA-Z0-9]))", "§$2");
+        input = input.replaceAll("§&", "&");
+        return input;
+    }
+
+    public static String encodeColorChar(String input) {
+        input = input.replaceAll("&", "&&");
+        input = input.replaceAll("(§([a-zA-Z0-9]))", "&$2");
+        return input;
+    }
+
     public static ItemStack[] getPlayerAllEquipments(HumanEntity player) {
         //装备列表
         ItemStack[] res = new ItemStack[6];
@@ -34,9 +46,10 @@ public class Tools {
         //返回装备列表
         return res;
     }
-    
+
     public static List<String> getItemLoreValueStr(MoreLoreEffectsPlugin plugin, String key, ItemStack fromItem, String cutStr) {
         if (fromItem == null) return null;
+        //TODO:实现临时修改某itemstack的数值，还有“无法触发攻击词条”
         //返回值
         List<String> values = new ArrayList<>();
         try {
@@ -59,7 +72,7 @@ public class Tools {
         }
         return values;
     }
-    
+
     public static double getItemLoreValueDoubleSum(MoreLoreEffectsPlugin plugin, String key, ItemStack fromItem) {
         List<String> values = getItemLoreValueStr(plugin, key, fromItem, "\\+");
         if (values == null) return 0;
@@ -77,7 +90,7 @@ public class Tools {
         }
         return res;
     }
-    
+
     public static double getItemLoreValueDoubleMax(MoreLoreEffectsPlugin plugin, String key, ItemStack fromItem) {
         List<String> values = getItemLoreValueStr(plugin, key, fromItem, " ");
         if (values == null) return -1;

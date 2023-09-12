@@ -4,23 +4,32 @@ main: org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin
 description: 通过修改物品的Lore，加入特殊的词条，可以给任意物品添加一些额外属性。
 authors: [ Clinlx,Kurumi ]
 commands:
-  lorelist:
+  checkloreskill:
     #别名
-    aliases: lls
+    aliases: clsk
     #描述这个命令
-    description: "查询现版本服务器中可用的所有特殊Lore词条. 别名:/lls"
+    description: "查看某个Lore技能的描述. 别名:/clsk"
     #用法
-    usage: "/lorelist [选项]  §7§l查询服务器中所有特殊Lore词条
-    注：选项可为{all,uni,atk,dfn}，若无参数则显示全部可用词条Lore"
+    usage: "/listlore <技能名>  §7§l查看某个Lore技能的描述\n"
     #没有权限的提示消息
     permission-message: "无权使用"
-  loreskills:
+  listlore:
+    #别名
+    aliases: llr
+    #描述这个命令
+    description: "查询现版本服务器中可用的所有特殊Lore词条. 别名:/llr"
+    #用法
+    usage: "/listlore [选项]  §7§l查询服务器中所有特殊Lore词条\n
+    注：选项可为{all,uni,atk,dfn}，若无参数则显示全部可用词条Lore\n"
+    #没有权限的提示消息
+    permission-message: "无权使用"
+  listloreskill:
     #别名
     aliases: llsk
     #描述这个命令
     description: "查询当前服务器数据中所有已经设置的Lore技能. 别名:/llsk"
     #用法
-    usage: "/loreskills"
+    usage: "/listloreskill [技能类型]  §7§l查询当前服务器数据中某类已经设置的Lore技能，若无参数则显示所有\n"
     #没有权限的提示消息
     permission-message: "无权使用"
   setloreskill:
@@ -29,10 +38,12 @@ commands:
     #描述这个命令
     description: "在服务器数据中添加或修改一项Lore技能. 别名:/slsk"
     #用法
-    usage: "/setloreskill [技能名] [冷却] [效果]  §7§l在服务器数据中注册一项Lore技能
-    注：冷却为整数，单位：毫秒。;
-    效果项是一条要执行的指令，由服务器执行，不用输入‘/’号，指令中用@s来指代物品使用者;
-    效果项中的&符号将会被转义为颜色符号，&&连用会被转义为单个&符号"
+    usage: "/setloreskill <技能名> <技能类型> <冷却> <效果>  §7§l在服务器数据中注册一项Lore技能\n
+    注：技能类型用于标记技能的分类，分类相同则冷却共享\n
+    冷却为整数，单位：毫秒。;\n
+    效果项是一条要执行的指令，由服务器执行，不用输入‘/’号;\n
+    指令中用&s来指代物品使用者名称,用&x、&y、&z来指代使用者的坐标;\n  
+    效果项中的&符号将会被转义为颜色符号，&&连用会被转义为单个&符号;\n"
     #没有权限的提示消息
     permission-message: "无权使用"
   delloreskill:
@@ -41,15 +52,44 @@ commands:
     #描述这个命令
     description: "删除一项已经在服务器数据中设置的Lore技能. 别名:/dlsk"
     #用法
-    usage: "/delloreskill [技能名]  §7§l在服务器数据中去除一项Lore技能"
+    usage: "/delloreskill <技能名>  §7§l在服务器数据中去除一项Lore技能\n"
     #没有权限的提示消息
     permission-message: "无权使用"
-  loadskillcode:
+  loreskillfile:
     #别名
-    aliases: lskc
+    aliases: lskf
     #描述这个命令
-    description: "指定一个Lore技能效果使用的lua代码文件，会替换技能原本的属性设置. 别名:/lskc"
+    description: "游戏内编辑一个Lore技能效果的文件设置. 别名:/lskf"
     #用法
-    usage: "/loadskillcode [技能名] [文件名] §7§l指定一个Lore技能效果使用的lua代码文件，文件目录：loreskillcodes/"
+    usage: "/loreskillfile <技能名> <文件类型> <操作>  §7§l游戏内编辑一个Lore技能效果的文件设置\n
+    文件类型: {config,code};\n
+      config - 技能配置文件，用于设置技能的属性;\n
+      code - lua代码文件，用于设置技能的效果;\n
+    操作: {save,load,book};\n
+      save - 从书与笔中写入内容到文件;\n
+      load - 从文件中读取内容到书与笔;\n"
+    #没有权限的提示消息
+    permission-message: "无权使用"
+  reloadloreskill:
+    #别名
+    aliases: rllsk
+    #描述这个命令
+    description: "重新从硬盘读取一个Lore技能效果的配置文件和lua代码文件，会替换技能原本的属性设置. 别名:/rllsk"
+    #用法
+    usage: "/reloadloreskill <技能名> §7§l重新从硬盘读取一个Lore技能效果的配置文件和lua代码文件，会替换技能原本的属性设置\n"
+    #没有权限的提示消息
+    permission-message: "无权使用"
+  loremanage:
+    #别名
+    aliases: lrm
+    #描述这个命令
+    description: "简单的Lore管理. 别名:/lrm"
+    #用法
+    usage: "/loremanage <操作>  §7§l对目前主手手持物品的Lore进行简单的管理\n
+    操作可为{add,copy,paste,clear}效果如下:\n
+    add <Effect> <Value> 添加一条属性Lore到手中物品;\n
+    copy 复制手中物品的Lore;\n
+    paste 粘贴复制的Lore到手中物品;\n
+    clear 清空手中物品的Lore;\n"
     #没有权限的提示消息
     permission-message: "无权使用"

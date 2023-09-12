@@ -1,6 +1,5 @@
 package org.clinlx.moreloreeffectsplugins;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.attribute.Attribute;
@@ -15,9 +14,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.clinlx.moreloreeffectsplugins.skilsys.CoolDownInfo;
+import org.clinlx.moreloreeffectsplugins.skilsys.SkillInfo;
+import org.clinlx.moreloreeffectsplugins.skilsys.luaj.SkillThread;
 
 import java.util.List;
 
@@ -26,17 +29,17 @@ import static org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH;
 public class EventsListener implements Listener {
     //保存主类的实例
     private final MoreLoreEffectsPlugin mainPlugin;
-    
+
     //构造方法
     public EventsListener(MoreLoreEffectsPlugin mainPlugin) {
         this.mainPlugin = mainPlugin;
     }
-    
+
     //简化调用
     private double getValueDouble(String key, ItemStack item) {
         return Tools.getItemLoreValueDoubleSum(mainPlugin, key, item);
     }
-    
+
     private boolean wrongLevelLimit(MoreLoreEffectsPlugin plugin, HumanEntity entity, int itemKind, ItemStack item, Cancellable event, boolean playerIsAtk) {
         //非玩家跳过检测
         if (!(entity instanceof Player)) return false;
@@ -74,7 +77,7 @@ public class EventsListener implements Listener {
         }
         return false;
     }
-    
+
     //任何生物被其他生物攻击时触发
     @EventHandler
     public void OnEntityDamaged(EntityDamageByEntityEvent event) {
@@ -83,9 +86,9 @@ public class EventsListener implements Listener {
         //获取信息
         Entity damagerEntity = event.getDamager();
         Entity targetEntity = event.getEntity();
-        //攻击者为玩家
+        //攻击者为类人
         if (damagerEntity instanceof HumanEntity) {
-            //转换攻击者玩家对象
+            //转换攻击者类人对象
             HumanEntity damagerPlayer = (HumanEntity) damagerEntity;
             //结算基础伤害
             double tryBaseDmg = Tools.getItemLoreValueDoubleMax(mainPlugin, "武器攻击", damagerPlayer.getInventory().getItemInMainHand());
@@ -102,6 +105,11 @@ public class EventsListener implements Listener {
             ItemStack[] equipments = Tools.getPlayerAllEquipments(damagerPlayer);
             ItemStack mainHandItem = equipments[4];
             ItemStack offHandItem = equipments[5];
+            //触发主手攻击特效
+            if (!wrongLevelLimit(mainPlugin, damagerPlayer, 4, mainHandItem, event, true)) {
+                //TODO: 触发主手攻击特效(和技能基本类似但是临时可以设置Lore属性的乘数或绝对值)
+
+            }
             //计算不同装备数值和
             for (int i = 0; i < 6; i++) {
                 ItemStack item = equipments[i];
@@ -188,9 +196,9 @@ public class EventsListener implements Listener {
                 newDmg *= prgFromBase;
             }
         }
-        //受击者为玩家
+        //受击者为类人
         if (targetEntity instanceof HumanEntity) {
-            //转换受击者玩家对象
+            //转换受击者类人对象
             HumanEntity targetPlayer = (HumanEntity) targetEntity;
             //定义减伤量总和
             double recDmgSum = 0;
@@ -231,25 +239,43 @@ public class EventsListener implements Listener {
         //设置伤害
         event.setDamage(newDmg);
     }
-    
+
     //玩家手持物品槽位变更时触发
     @EventHandler
     public void OnChangedHeld(PlayerItemHeldEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
+    //当玩家死亡时触发
+    @EventHandler
+    public void OnPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        for (long id : SkillThread.getPlayerSkillThreads(player.getName())) {
+            SkillThread.FinishLuaSKill(id);
+        }
+    }
+
     //玩家重生事件触发
     @EventHandler
     public void OnRespawn(PlayerRespawnEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
     //玩家进入服务器事件触发
     @EventHandler
     public void OnJoinServer(PlayerJoinEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
+    //玩家退出服务器事件触发
+    @EventHandler
+    public void OnQuitServer(PlayerQuitEvent event) {
+        Player player = event.getPlayer();
+        for (long id : SkillThread.getPlayerSkillThreads(player.getName())) {
+            SkillThread.FinishLuaSKill(id);
+        }
+    }
+
     //当玩家关闭背包时触发
     @EventHandler
     public void OnInventoryClose(InventoryCloseEvent event) {
@@ -259,25 +285,25 @@ public class EventsListener implements Listener {
             mainPlugin.getPlayerState().updatePlayerLoreEffects(player);
         }
     }
-    
+
     //玩家丢出物品时触发
     @EventHandler
     public void OnDropItem(PlayerDropItemEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
     //当玩家与装甲架交互并且进行交换, 取回或放置物品时触发本事件
     @EventHandler
     public void OnArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
     //某玩家工具耐久消耗完毕时触发
     @EventHandler
     public void OnItemBreak(PlayerItemBreakEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
     //任何生物拾取物品时触发
     @EventHandler
     public void OnItemBreak(EntityPickupItemEvent event) {
@@ -287,13 +313,13 @@ public class EventsListener implements Listener {
             mainPlugin.getPlayerState().updatePlayerLoreEffects(player);
         }
     }
-    
+
     //玩家用快捷键互换主手和副手的物品时触发本事件
     @EventHandler
     public void OnSwapHandItems(PlayerSwapHandItemsEvent event) {
         mainPlugin.getPlayerState().updatePlayerLoreEffects(event.getPlayer());
     }
-    
+
     //当玩家对一个对象或空气进行交互时触发本事件
     @EventHandler
     public void OnPlayerClick(PlayerInteractEvent event) {
@@ -306,13 +332,14 @@ public class EventsListener implements Listener {
         ItemStack mainItem = player.getInventory().getItemInMainHand();
         ItemStack offItem = player.getInventory().getItemInOffHand();
         boolean isMainHand = event.getItem().equals(mainItem);
+        ////左右键均可部分
         //不满足等级要求的部位强制掉落
         if (wrongLevelLimit(mainPlugin, player, event.getItem().equals(mainItem) ? 4 : 5, event.getItem(), event, true)) {
             return;
         }
         //如果按右键
         if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            //副手BUG修复
+            //副手BUG修复(主手有技能时取消副手的右键按键效果)
             if (!isMainHand) {
                 //获取主手物品的技能词条
                 List<String> mainHandNameList = Tools.getItemLoreValueStr(mainPlugin, "消耗", mainItem, " ");
@@ -324,7 +351,7 @@ public class EventsListener implements Listener {
                     event.setCancelled(true);
                 }
             }
-            
+
             //获取物品的消耗品技能词条
             boolean readyConsume = false;
             List<String> skillNameList = Tools.getItemLoreValueStr(mainPlugin, "消耗", event.getItem(), " ");
@@ -334,51 +361,43 @@ public class EventsListener implements Listener {
             //获取物品的技能词条
             if (!readyConsume)
                 skillNameList = Tools.getItemLoreValueStr(mainPlugin, "技能", event.getItem(), " ");
-            
+
             //确认物品有技能词条
             if (skillNameList == null || skillNameList.size() == 0)
                 return;
-            
-            //禁止物品右键事件触发
-            event.setCancelled(true);
-            
+            //是否禁止物品右键事件触发
+            boolean cancelButton = false;
             //遍历触发每一个技能
             for (String skillName : skillNameList) {
                 //确认这个技能存在
-                if (mainPlugin.skillsRegister.containsKey(skillName)) {
-                    if (!mainPlugin.timePlayerLastUseSkill.containsKey(playerName))
-                        mainPlugin.timePlayerLastUseSkill.put(playerName, 0L);
+                if (mainPlugin.getSkillData().skillExist(skillName)) {
                     //获取技能信息
-                    SkillInfo skillInfo = mainPlugin.skillsRegister.get(skillName);
+                    SkillInfo skillInfo = mainPlugin.getSkillData().getSkill(skillName);
+                    //确认是否取消按键
+                    if (skillInfo.cancelMouseButton)
+                        cancelButton = true;
                     //确认技能CD
-                    long nowTime = System.currentTimeMillis();
-                    long dt = nowTime - mainPlugin.timePlayerLastUseSkill.get(playerName);
-                    if (readyConsume || dt >= skillInfo.skillCoolDown) {
+                    if (skillInfo.getCoolDownInfo(playerName).skillTypeReady()) {
                         //触发技能
-                        String cmd = skillInfo.skillEffect;
-                        cmd = cmd.replace(" @s", " " + playerName);
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                        skillInfo.invoke(playerName, true);
                         player.sendMessage("触发" + (readyConsume ? "消耗" : "") + "技能[§e" + skillName + "§r]");
-                        // 在目标位置播放粒子效果
-                        Location location = player.getLocation();
-                        location.setY(location.getY() + 1.5);
-                        player
-                                .getWorld()
-                                .spawnParticle(Particle.CRIT_MAGIC, location, 25, 0.5, 0.5, 0.5);
-                        //进入CD
-                        if (!readyConsume)
-                            mainPlugin.timePlayerLastUseSkill.put(playerName, nowTime);
                     } else {
                         //技能在CD
-                        double waitTime = (skillInfo.skillCoolDown - dt) * 0.001;
-                        if (dt >= 10)
-                            player.sendMessage("§4在使用技能[§e" + skillName + "§r§4]前还需要等待§e" + String.format("%.2f", waitTime) + "§4秒！");
+                        if (System.currentTimeMillis() - skillInfo.getCoolDownInfo(playerName).getLastUseTime() >= 10
+                                && skillInfo.echoCoolDownLeftInform) {
+                            if (skillInfo.getCoolDownInfo(playerName).getWaitTime() == CoolDownInfo.runningSign) {
+                                //player.sendMessage("");
+                            } else
+                                player.sendMessage("§4在使用技能[§e" + skillName + "§r§4]前还需要等待" + skillInfo.getCoolDownInfo(playerName).getWaitTimeStr() + "§4的时间！");
+                        }
                     }
                 } else {
                     //技能不存在
                     player.sendMessage("技能[§e" + skillName + "§r]的效果不存在！");
                 }
             }
+            //设置物品右键事件触发情况
+            event.setCancelled(cancelButton);
             //消耗物品
             if (readyConsume) {
                 if (event.getItem().equals(offItem)) {
@@ -389,9 +408,10 @@ public class EventsListener implements Listener {
             }
             return;
         }
+        //如果按左键
         if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            
-            
+
+
         }
     }
     /*
