@@ -50,6 +50,7 @@ public class ListLoreCommand extends BaseCommand {
             sender.sendMessage("吸血: +value" + "§r§7§l (作为主手近战时，增加攻击造成的回复)");
             sender.sendMessage("暴击率: +value" + "§7§l%" + "§r§7§l (作为任意装备时，增加攻击暴击的几率)");
             sender.sendMessage("暴击伤害: +value" + "§7§l%" + "§r§7§l (作为任意装备时，增加攻击暴击时的增伤比，基础倍率为150%)");
+            //TODO:远程增伤
         }
         if (page.equals("all") || page.equals("dfn")) {
             sender.sendMessage("----------------");

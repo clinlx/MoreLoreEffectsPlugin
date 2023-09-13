@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin;
 import org.clinlx.moreloreeffectsplugins.Tools;
+import org.clinlx.moreloreeffectsplugins.skilsys.CoolDownInfo;
 import org.clinlx.moreloreeffectsplugins.skilsys.SkillInfo;
 
 import java.util.ArrayList;
@@ -36,7 +37,10 @@ public class CheckLoreSkillCommand extends BaseCommand {
         SkillInfo skillInfo = plugin.getSkillData().getSkill(args[0]);
         sender.sendMessage("技能名: [" + skillInfo.skillName + "]");
         sender.sendMessage("技能类型: '" + skillInfo.skillType + "'");
-        sender.sendMessage("技能冷却: " + skillInfo.skillCoolDown * 0.001 + "秒");
+        if (skillInfo.skillCoolDown == CoolDownInfo.runningSign)
+            sender.sendMessage("技能冷却: 无限久");
+        else
+            sender.sendMessage("技能冷却: " + skillInfo.skillCoolDown * 0.001 + "秒");
         sender.sendMessage("技能描述: \"" + skillInfo.skillInformation + "\"");
         return true;
     }

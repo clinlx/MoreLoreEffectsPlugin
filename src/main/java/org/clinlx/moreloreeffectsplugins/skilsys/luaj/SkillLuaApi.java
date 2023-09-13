@@ -5,6 +5,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin;
 import org.clinlx.moreloreeffectsplugins.skilsys.SkillInfo;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+
+import java.util.concurrent.Callable;
 
 public class SkillLuaApi {
     public static boolean skillThreadAlive(long id) {
@@ -15,6 +19,67 @@ public class SkillLuaApi {
     public static void ensureThreadAlive(long id) throws LuaStopException {
         if (!skillThreadAlive(id))
             throw new LuaStopException("Lua Stop");
+    }
+
+    public static void callInBukkit(Runnable runnable, long id) {
+        SkillThread skillThread = SkillThread.getSkillThread(id);
+        if (skillThread.inPreProcess) {
+            runnable.run();
+            return;
+        }
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                if (!skillThreadAlive(id)) return;
+                runnable.run();
+            }
+        }.runTask(MoreLoreEffectsPlugin.getInstance());
+    }
+
+    public static <T> T callInBukkitBlock(Callable<T> callable, long id) throws Exception {
+        SkillThread skillThread = SkillThread.getSkillThread(id);
+        if (skillThread.inPreProcess) {
+            return callable.call();
+        }
+        try {
+            skillThread.returnObj = null;
+            skillThread.hasReturn = 0;
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (!skillThreadAlive(id)) {
+                        skillThread.hasReturn = -1024;
+                        return;
+                    }
+                    try {
+                        skillThread.returnObj = callable.call();
+                        skillThread.hasReturn = 1;
+                    } catch (Exception e) {
+                        skillThread.returnObj = e;
+                        skillThread.hasReturn = -1;
+                    }
+                }
+            }.runTask(MoreLoreEffectsPlugin.getInstance());
+            int hasReturn;
+            Object retObj;
+            try {
+                while (skillThread.hasReturn == 0)
+                    Thread.sleep(10);
+                hasReturn = skillThread.hasReturn;
+                retObj = skillThread.returnObj;
+            } catch (Exception ce) {
+                throw new LuaStopException("Lua Stop");
+            }
+            if (hasReturn == 1) {
+                return (T) retObj;
+            } else if (hasReturn == -1024) {
+                throw new LuaStopException("Lua Stop");
+            } else {
+                throw (Exception) retObj;
+            }
+        } catch (LuaStopException e) {
+            throw e;
+        }
     }
 
     public static class ServerApi {
@@ -34,16 +99,23 @@ public class SkillLuaApi {
             Thread.sleep(time);
         }
 
-        //TODO:阻塞直到获取返回值
         public void Command(String cmd) throws LuaStopException {
             ensureThreadAlive(id);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!skillThreadAlive(id)) return;
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
-                }
-            }.runTask(MoreLoreEffectsPlugin.getInstance());
+            callInBukkit(() -> {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+            }, id);
+        }
+
+        //阻塞直到获取返回值
+        public boolean CommandWithRes(String cmd) throws LuaStopException {
+            ensureThreadAlive(id);
+            try {
+                return callInBukkitBlock(() -> {
+                    return Bukkit.dispatchCommand(Bukkit.getConsoleSender(), cmd);
+                }, id);
+            } catch (Exception ignored) {
+                return false;
+            }
         }
         //TODO:播放粒子效果
     }
@@ -65,22 +137,29 @@ public class SkillLuaApi {
             return skillInfo.skillCoolDown;
         }
 
-        //TODO:修改任意技能类型的CD
         public void SetCoolDown(int value) throws LuaStopException {
             ensureThreadAlive(id);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!skillThreadAlive(id)) return;
-                    SkillThread skillThread = SkillThread.getSkillThread(id);
-                    SkillInfo skillInfo = skillThread.skillInfo;
-                    if (skillThread.changeCoolDown) {
-                        skillInfo.getCoolDownInfo(player.getName()).useSkillTypeCoolDown(value);
-                    }
+            callInBukkit(() -> {
+                SkillThread skillThread = SkillThread.getSkillThread(id);
+                SkillInfo skillInfo = skillThread.skillInfo;
+                if (skillThread.changeCoolDown) {
+                    skillInfo.getCoolDownInfo(player.getName()).useSkillTypeCoolDown(value);
                 }
-            }.runTask(MoreLoreEffectsPlugin.getInstance());
-            //MoreLoreEffectsPlugin.getInstance().getSkillLuaEventMng().addEvent("setCoolDownTime", String.valueOf(value));
+            }, id);
         }
+
+        //修改任意技能类型的CD
+        public void SetTypeCoolDown(String type, int value) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                SkillThread skillThread = SkillThread.getSkillThread(id);
+                SkillInfo skillInfo = skillThread.skillInfo;
+                if (skillThread.changeCoolDown) {
+                    MoreLoreEffectsPlugin.getInstance().getSkillData().getCoolDownSys(player.getName()).getTypeCoolDownInfo(type).useSkillTypeCoolDown(value);
+                }
+            }, id);
+        }
+
         //TODO:随时开关隐藏右键提示冷却等待文本的功能
     }
 
@@ -130,13 +209,9 @@ public class SkillLuaApi {
 
         public void Command(String cmd) throws LuaStopException {
             ensureThreadAlive(id);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!skillThreadAlive(id)) return;
-                    Bukkit.dispatchCommand(player, cmd);
-                }
-            }.runTask(MoreLoreEffectsPlugin.getInstance());
+            callInBukkit(() -> {
+                Bukkit.dispatchCommand(player, cmd);
+            }, id);
         }
 
         public double getHealth() throws LuaStopException {
@@ -151,37 +226,45 @@ public class SkillLuaApi {
 
         public void setHealth(double value) throws LuaStopException {
             ensureThreadAlive(id);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!skillThreadAlive(id)) return;
-                    player.setHealth(value);
-                }
-            }.runTask(MoreLoreEffectsPlugin.getInstance());
+            callInBukkit(() -> {
+                player.setHealth(value);
+            }, id);
         }
 
         //TODO:更多API，如修改属性
     }
 
-    //TODO:UnsafeApi 回调
-    public static class Unsafe {
+    public static class UnsafeArea {
         private final long id;
         private final String userName;
 
-        public Unsafe(String userName, long id) {
+        public UnsafeArea(String userName, long id) {
             this.id = id;
             this.userName = userName;
         }
 
-        public void RunTask(Runnable runnable) throws LuaStopException {
+        public LuaValue RunTask(LuaValue luaValue) throws Exception {
             ensureThreadAlive(id);
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    if (!skillThreadAlive(id)) return;
-                    runnable.run();
-                }
-            }.runTask(MoreLoreEffectsPlugin.getInstance());
+            return callInBukkitBlock(() -> {
+                return luaValue.call(CoerceJavaToLua.coerce(new UnsafeApi(userName, id)));
+            }, id);
+        }
+    }
+
+    public static class UnsafeApi {
+        private final long id;
+        private final String userName;
+        private final Player player;
+
+        public UnsafeApi(String userName, long id) {
+            this.id = id;
+            this.userName = userName;
+            this.player = Bukkit.getPlayer(userName);
+        }
+
+        public Player getPlayer() throws LuaStopException {
+            ensureThreadAlive(id);
+            return player;
         }
     }
     //TODO:ItemApi

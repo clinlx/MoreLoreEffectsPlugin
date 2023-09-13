@@ -61,6 +61,9 @@ public class SkillThread extends LuaThread {
     public final ItemStack item;
     public final SkillInfo skillInfo;
     public final boolean changeCoolDown;
+    public volatile boolean inPreProcess = true;
+    public volatile Object returnObj = null;
+    public volatile int hasReturn = 0;
 
     private SkillThread(String userName, ItemStack item, SkillInfo skillInfo, boolean changeCoolDown) {
         super(skillInfo.skillCode.luaHead, skillInfo.skillCode.preProcess, skillInfo.skillCode.codeBody);
@@ -86,7 +89,12 @@ public class SkillThread extends LuaThread {
 
         putSkillThread(thread.getId(), thread);
 
-        if (!skillInfo.skillCode.preProcess.isEmpty()) {
+        //设置冷却
+        if (changeCoolDown)
+            skillInfo.getCoolDownInfo(userName).useSkillTypeCoolDown(CoolDownInfo.runningSign);
+
+        //运行预处理部分
+        if (!skillInfo.skillCode.preProcess.trim().isEmpty()) {
             try {
                 thread.preProcessChunk.call();
             } catch (Exception e) {
@@ -94,14 +102,14 @@ public class SkillThread extends LuaThread {
                 printLog(e.getMessage());
                 //for (StackTraceElement i : e.getStackTrace())
                 //    printLog(i.toString());
-                try {
+                Player player = Bukkit.getPlayer(userName);
+                if (player.isOnline())
                     Bukkit.getPlayer(userName).sendMessage(e.getMessage() + "\n§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能预处理出错，请联系管理员！");
-                } catch (Exception e2) {
-
-                }
                 return -1;
             }
         }
+        thread.inPreProcess = false;
+        
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -118,12 +126,6 @@ public class SkillThread extends LuaThread {
         if (thread == null) {
             printLog("FinishLuaSKill参数错误");
             return;
-        }
-        CoolDownInfo coolDownInfo = thread.skillInfo.getCoolDownInfo(thread.playerName);
-        if (coolDownInfo != null && thread.changeCoolDown) {
-            if (coolDownInfo.getWaitTime() == CoolDownInfo.runningSign) {
-                coolDownInfo.useSkillTypeCoolDown(thread.skillInfo.skillCoolDown);
-            }
         }
         thread.needStop = true;
     }
@@ -146,6 +148,12 @@ public class SkillThread extends LuaThread {
                     Bukkit.getPlayer(player.getName()).sendMessage(e.getMessage() + "\n§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能运行出错，请联系管理员！");
             }
         } finally {
+            CoolDownInfo coolDownInfo = this.skillInfo.getCoolDownInfo(this.playerName);
+            if (coolDownInfo != null && this.changeCoolDown) {
+                if (coolDownInfo.getWaitTime() == CoolDownInfo.runningSign) {
+                    coolDownInfo.useSkillTypeCoolDown(this.skillInfo.skillCoolDown);
+                }
+            }
             new BukkitRunnable() {
                 @Override
                 public void run() {
