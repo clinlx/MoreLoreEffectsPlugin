@@ -18,7 +18,8 @@ public class SkillCode {
                         "Player = luajava.newInstance(\"" + apiClassName + "$PlayerApi\",CALLER_NAME,CALL_BODY_ID);\n" +
                         "Skill = luajava.newInstance(\"" + apiClassName + "$SkillApi\",CALLER_NAME,CALL_BODY_ID);\n" +
                         "Server = luajava.newInstance(\"" + apiClassName + "$ServerApi\",CALL_BODY_ID);\n" +
-                        "Unsafe = luajava.newInstance(\"" + apiClassName + "$UnsafeArea\",CALLER_NAME,CALL_BODY_ID);\n";//luajava.bindClass
+                        "Unsafe = luajava.newInstance(\"" + apiClassName + "$UnsafeArea\",CALLER_NAME,CALL_BODY_ID,luajava);\n" +
+                        "CALLER_NAME = nil;CALL_BODY_ID = nil;luajava = nil;\n";//luajava.bindClass
         preProcess = "";
         codeBody = "";
     }

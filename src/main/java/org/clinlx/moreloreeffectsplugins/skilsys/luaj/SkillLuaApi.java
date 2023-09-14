@@ -1,6 +1,9 @@
 package org.clinlx.moreloreeffectsplugins.skilsys.luaj;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin;
@@ -11,6 +14,64 @@ import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import java.util.concurrent.Callable;
 
 public class SkillLuaApi {
+    public static class WorldPos {
+        public static Location getBukkitLocation(WorldPos worldPos) {
+            World world = Bukkit.getWorld(worldPos.worldName);
+            if (world == null) return null;
+            return new Location(world, worldPos.x, worldPos.y, worldPos.z, worldPos.yaw, worldPos.pitch);
+        }
+
+        public WorldPos(Location location) {
+            this.worldName = location.getWorld().getName();
+            this.x = location.getX();
+            this.y = location.getY();
+            this.z = location.getZ();
+            this.pitch = location.getPitch();
+            this.yaw = location.getYaw();
+        }
+
+        public WorldPos(String worldName, double x, double y, double z) {
+            this.worldName = worldName;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            pitch = 0;
+            yaw = 0;
+        }
+
+        public WorldPos(String worldName, double x, double y, double z, float pitch, float yaw) {
+            this.worldName = worldName;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.pitch = pitch;
+            this.yaw = yaw;
+        }
+
+        public WorldPos getHeadForwardPos(double distance) {
+            double radPitch = Math.toRadians(pitch);
+            double radYaw = Math.toRadians(yaw);
+            double cosPitch = Math.cos(radPitch);
+            double sinPitch = Math.sin(radPitch);
+            double cosYaw = Math.cos(radYaw);
+            double sinYaw = Math.sin(radYaw);
+            double dx = -sinYaw * cosPitch * distance;
+            double dy = -sinPitch * distance;
+            double dz = cosYaw * cosPitch * distance;
+            return new WorldPos(worldName, x + dx, y + dy, z + dz, pitch, yaw);
+        }
+
+        public WorldPos localPosToWorld(WorldPos localPos) {
+            double x = this.x + localPos.x * Math.cos(Math.toRadians(this.yaw)) - localPos.z * Math.sin(Math.toRadians(this.yaw));
+            double z = this.z + localPos.x * Math.sin(Math.toRadians(this.yaw)) + localPos.z * Math.cos(Math.toRadians(this.yaw));
+            return new WorldPos(worldName, x, y + localPos.y, z, pitch + localPos.pitch, yaw + localPos.yaw);
+        }
+
+        public String worldName;
+        public double x, y, z;
+        public float pitch, yaw;
+    }
+
     public static boolean skillThreadAlive(long id) {
         SkillThread skillThread = SkillThread.getSkillThread(id);
         return skillThread != null && !skillThread.needStop;
@@ -31,7 +92,11 @@ public class SkillLuaApi {
             @Override
             public void run() {
                 if (!skillThreadAlive(id)) return;
-                runnable.run();
+                try {
+                    runnable.run();
+                } catch (Exception e) {
+                    SkillThread.HandlerLuaException(e, SkillThread.getSkillThread(id));
+                }
             }
         }.runTask(MoreLoreEffectsPlugin.getInstance());
     }
@@ -117,7 +182,33 @@ public class SkillLuaApi {
                 return false;
             }
         }
-        //TODO:播放粒子效果
+
+        //构造WorldPos
+        public WorldPos buildWorldPos(Location location) {
+            return new WorldPos(location);
+        }
+
+        public WorldPos buildWorldPos(String worldName, double x, double y, double z) {
+            return new WorldPos(worldName, x, y, z);
+        }
+
+        public WorldPos buildWorldPos(String worldName, double x, double y, double z, float pitch, float yaw) {
+            return new WorldPos(worldName, x, y, z, pitch, yaw);
+        }
+
+        //播放粒子效果
+        public void DrawParticle(String particleName, int p_num, WorldPos worldPos, double r_x, double r_y, double r_z) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                World world = Bukkit.getWorld(worldPos.worldName);
+                Location pos = WorldPos.getBukkitLocation(worldPos);
+                if (world == null || pos == null) {
+                    MoreLoreEffectsPlugin.getInstance().getLogger().info("DrawParticle: world or pos is null");
+                    return;
+                }
+                world.spawnParticle(Particle.valueOf(particleName), pos, p_num, r_x, r_y, r_z);
+            }, id);
+        }
     }
 
     public static class SkillApi {
@@ -126,10 +217,10 @@ public class SkillLuaApi {
 
         public SkillApi(String userName, long id) {
             this.id = id;
-            //获取主手物品
             player = Bukkit.getPlayer(userName);
         }
 
+        //获取技能默认CD
         public long getDefCd() throws LuaStopException {
             ensureThreadAlive(id);
             SkillThread skillThread = SkillThread.getSkillThread(id);
@@ -137,6 +228,7 @@ public class SkillLuaApi {
             return skillInfo.skillCoolDown;
         }
 
+        //设置当前技能CD
         public void SetCoolDown(int value) throws LuaStopException {
             ensureThreadAlive(id);
             callInBukkit(() -> {
@@ -172,9 +264,15 @@ public class SkillLuaApi {
             player = Bukkit.getPlayer(userName);
         }
 
+        //获取玩家名
         public String getName() throws LuaStopException {
             ensureThreadAlive(id);
             return player.getName();
+        }
+
+        public String getWorldName() throws LuaStopException {
+            ensureThreadAlive(id);
+            return player.getWorld().getName();
         }
 
         public double getX() throws LuaStopException {
@@ -202,6 +300,12 @@ public class SkillLuaApi {
             return player.getLocation().getPitch();
         }
 
+        public WorldPos getWorldPos() throws LuaStopException {
+            ensureThreadAlive(id);
+            Location location = player.getLocation();
+            return new WorldPos(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
+        }
+
         public void Inform(String message) throws LuaStopException {
             ensureThreadAlive(id);
             player.sendMessage(message);
@@ -211,6 +315,27 @@ public class SkillLuaApi {
             ensureThreadAlive(id);
             callInBukkit(() -> {
                 Bukkit.dispatchCommand(player, cmd);
+            }, id);
+        }
+
+        //阻塞直到获取返回值
+        public boolean CommandWithRes(String cmd) throws LuaStopException {
+            ensureThreadAlive(id);
+            try {
+                return callInBukkitBlock(() -> {
+                    return Bukkit.dispatchCommand(player, cmd);
+                }, id);
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+
+        public void Teleport(WorldPos worldPos) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                Location pos = WorldPos.getBukkitLocation(worldPos);
+                if (pos == null) return;
+                player.teleport(pos);
             }, id);
         }
 
@@ -237,16 +362,33 @@ public class SkillLuaApi {
     public static class UnsafeArea {
         private final long id;
         private final String userName;
+        public final UnsafeApi api;
 
-        public UnsafeArea(String userName, long id) {
+        public final LuaValue java;
+
+        public UnsafeArea(String userName, long id, LuaValue javaApi) {
             this.id = id;
             this.userName = userName;
+            this.java = javaApi;
+            this.api = new UnsafeApi(userName, id, java);
         }
 
-        public LuaValue RunTask(LuaValue luaValue) throws Exception {
+        public LuaValue getUnsafeLuaJ() throws LuaStopException {
+            ensureThreadAlive(id);
+            return java;
+        }
+
+        public void RunTask(LuaValue luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                luaValue.call(CoerceJavaToLua.coerce(api));
+            }, id);
+        }
+
+        public LuaValue RunTaskWithRes(LuaValue luaValue) throws Exception {
             ensureThreadAlive(id);
             return callInBukkitBlock(() -> {
-                return luaValue.call(CoerceJavaToLua.coerce(new UnsafeApi(userName, id)));
+                return luaValue.call(CoerceJavaToLua.coerce(api));
             }, id);
         }
     }
@@ -256,10 +398,13 @@ public class SkillLuaApi {
         private final String userName;
         private final Player player;
 
-        public UnsafeApi(String userName, long id) {
+        public final LuaValue java;
+
+        public UnsafeApi(String userName, long id, LuaValue java) {
             this.id = id;
             this.userName = userName;
             this.player = Bukkit.getPlayer(userName);
+            this.java = java;
         }
 
         public Player getPlayer() throws LuaStopException {
