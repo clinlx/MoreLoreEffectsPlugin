@@ -98,6 +98,6 @@ public class LoreManageCommand extends BaseCommand {
                 return Arrays.asList("0", "+0", "+0%");
             }
         }
-        return null;
+        return emptyList;
     }
 }

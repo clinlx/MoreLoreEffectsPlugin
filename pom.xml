@@ -6,7 +6,7 @@
 
     <groupId>org.clinlx</groupId>
     <artifactId>MoreLoreEffectsPlugin</artifactId>
-    <version>1.12.2-a0.3.0</version>
+    <version>1.12.2-a0.3.1</version>
     <packaging>jar</packaging>
 
     <name>MoreLoreEffectsPlugin</name>

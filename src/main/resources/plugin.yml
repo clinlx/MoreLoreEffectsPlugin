@@ -93,3 +93,14 @@ commands:
     clear 清空手中物品的Lore;\n"
     #没有权限的提示消息
     permission-message: "无权使用"
+  resetlorecooldown:
+    #别名
+    aliases: rlcd
+    #描述这个命令
+    description: "Lore技能冷却时间重置. 别名:/rlcd"
+    #用法
+    usage: "/resetlorecooldown <玩家名> <技能名>  §7§l指定玩家的指定Lore技能冷却时间重置\n
+    重置技能CD本质上是重置技能类型的CD，同类技能也会一同重置;\n
+    可以使用通配置符'*'，如/rlcd * *\n"
+    #没有权限的提示消息
+    permission-message: "无权使用"

@@ -36,6 +36,7 @@ public final class MoreLoreEffectsPlugin extends JavaPlugin {
         new LoreSkillFileCommand(this).regTo("loreskillfile");
         new LoreManageCommand(this).regTo("loremanage");
         new ReLoadLoreSkillCommand(this).regTo("reloadloreskill");
+        new ResetLoreCoolDownCommand(this).regTo("resetlorecooldown");
         //功能
         playerState = new PlayerEffectsState(this);
         EventsListener damageEventListener = new EventsListener(this);

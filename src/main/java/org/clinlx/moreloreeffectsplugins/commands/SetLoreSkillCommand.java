@@ -71,12 +71,12 @@ public class SetLoreSkillCommand extends BaseCommand {
                 String commandName = args[cutLength - 1];
                 PluginCommand pluginCommand = Bukkit.getPluginCommand(commandName);
                 if (pluginCommand == null) {
-                    return null;
+                    return emptyList;
                 }
                 return pluginCommand.getTabCompleter().onTabComplete(sender, pluginCommand, commandName, newArgs);
             } catch (Exception e) {
-                return null;
+                return emptyList;
             }
-        } else return null;
+        } else return emptyList;
     }
 }

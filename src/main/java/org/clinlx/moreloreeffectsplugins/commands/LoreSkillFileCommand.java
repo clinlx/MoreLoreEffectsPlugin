@@ -33,6 +33,6 @@ public class LoreSkillFileCommand extends BaseCommand {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         //TODO: 补全测试
-        return null;
+        return emptyList;
     }
 }

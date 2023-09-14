@@ -45,6 +45,6 @@ public class DelLoreSkillCommand extends BaseCommand {
         if (args.length == 1) {
             return plugin.getSkillData().getSkillList();
         } else
-            return null;
+            return emptyList;
     }
 }

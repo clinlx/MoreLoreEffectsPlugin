@@ -66,6 +66,6 @@ public class ListLoreCommand extends BaseCommand {
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
             return Arrays.asList("all", "uni", "atk", "dfn");
-        } else return null;
+        } else return emptyList;
     }
 }

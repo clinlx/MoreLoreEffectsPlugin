@@ -52,8 +52,22 @@ public class SkillData {
         return playerCoolDownSys.get(playerName);
     }
 
-    public void clearCoolDownSys() {
+    public void clearAllCoolDownSys() {
         playerCoolDownSys.clear();
+    }
+
+    public void clearPlayerCoolDownSys(String playerName) {
+        playerCoolDownSys.remove(playerName);
+    }
+
+    public void clearTypeCoolDownSys(String skillType) {
+        for (String playerName : playerCoolDownSys.keySet()) {
+            clearPlayerTypeCoolDownSys(playerName, skillType);
+        }
+    }
+
+    public void clearPlayerTypeCoolDownSys(String playerName, String skillType) {
+        playerCoolDownSys.get(playerName).getTypeCoolDownInfo(skillType).setSkillTypeCoolDownTimeLen(0);
     }
 
     public void setSkill(String name, String skillType, long skillCoolDown, String skillEffect) {
@@ -133,6 +147,8 @@ public class SkillData {
             Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
             SkillInfo loadedSkillInfo = gson.fromJson(infoJsonBuilder.toString(), SkillInfo.class);
             if (loadedSkillInfo == null) return false;
+            if (loadedSkillInfo.skillType == null)
+                loadedSkillInfo.skillType = "[ " + skillName + " ]";
             SkillInfo.setName(loadedSkillInfo, skillName);
             newSkillInfo = loadedSkillInfo;
         } catch (Exception e) {

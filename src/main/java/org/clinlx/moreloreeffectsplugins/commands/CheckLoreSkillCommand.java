@@ -65,6 +65,6 @@ public class CheckLoreSkillCommand extends BaseCommand {
             // 将 Set 转换为 List 并返回
             return new ArrayList<>(set);
         }
-        return null;
+        return emptyList;
     }
 }
