@@ -85,7 +85,20 @@ public class SkillThread extends LuaThread {
 
         MoreLoreEffectsPlugin.getInstance().getLogger().info("玩家'" + userName + "'使用了技能[" + skillInfo.skillName + "]");
 
-        SkillThread thread = new SkillThread(userName, item, skillInfo, changeCoolDown);
+        //创建线程,技能初始化
+        SkillThread thread;
+        try {
+            thread = new SkillThread(userName, item, skillInfo, changeCoolDown);
+        } catch (Exception e) {
+            printLog(e.getMessage());
+            Player player = Bukkit.getPlayer(userName);
+            if (player.isOnline()) {
+                if (player.isOp())
+                    player.sendMessage(e.getMessage());
+                player.sendMessage("§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能存在语法错误，请联系管理员！");
+            }
+            return -1;
+        }
 
         putSkillThread(thread.getId(), thread);
 
@@ -103,8 +116,11 @@ public class SkillThread extends LuaThread {
                 //for (StackTraceElement i : e.getStackTrace())
                 //    printLog(i.toString());
                 Player player = Bukkit.getPlayer(userName);
-                if (player.isOnline())
-                    Bukkit.getPlayer(userName).sendMessage(e.getMessage() + "\n§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能预处理出错，请联系管理员！");
+                if (player.isOnline()) {
+                    if (player.isOp())
+                        player.sendMessage(e.getMessage());
+                    player.sendMessage("§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能预处理出错，请联系管理员！");
+                }
                 return -1;
             }
         }
@@ -133,15 +149,20 @@ public class SkillThread extends LuaThread {
     public static void HandlerLuaException(Exception e, SkillThread skillThread) {
         if (e.getCause() != null && e.getCause().toString().trim().equals("org.clinlx.moreloreeffectsplugins.skilsys.luaj.LuaStopException: Lua Stop")) {
             printLog("玩家‘" + skillThread.playerName + "’死亡或离开，技能[" + skillThread.skillInfo.skillName + "]效果中止");
-            if (skillThread.player.isOnline())
-                Bukkit.getPlayer(skillThread.player.getName()).sendMessage("§c§l技能[§r§e" + skillThread.skillInfo.skillName + "§c§l]效果中止");
+            if (skillThread.player.isOnline()) {
+                skillThread.player.sendMessage("§c§l技能[§r§e" + skillThread.skillInfo.skillName + "§c§l]效果中止");
+            }
         } else {
             printLog(e.getMessage());
             printLog("玩家‘" + skillThread.playerName + "’使用技能[" + skillThread.skillInfo.skillName + "]时异常");
             //for (StackTraceElement i : e.getStackTrace())
             //    printLog(i.toString());
-            if (skillThread.player.isOnline())
-                Bukkit.getPlayer(skillThread.player.getName()).sendMessage(e.getMessage() + "\n§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能运行出错，请联系管理员！");
+            if (skillThread.player.isOnline()) {
+                if (skillThread.player.isOp())
+                    skillThread.player.sendMessage(e.getMessage());
+                skillThread.player.sendMessage("§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能运行出错，请联系管理员！");
+            }
+
         }
     }
 
