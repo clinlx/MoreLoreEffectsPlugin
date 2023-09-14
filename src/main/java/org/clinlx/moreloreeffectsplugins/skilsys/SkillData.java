@@ -67,7 +67,7 @@ public class SkillData {
     }
 
     public void clearPlayerTypeCoolDownSys(String playerName, String skillType) {
-        playerCoolDownSys.get(playerName).getTypeCoolDownInfo(skillType).setSkillTypeCoolDownTimeLen(0);
+        getCoolDownSys(playerName).getTypeCoolDownInfo(skillType).setSkillTypeCoolDownTimeLen(0);
     }
 
     public void setSkill(String name, String skillType, long skillCoolDown, String skillEffect) {
