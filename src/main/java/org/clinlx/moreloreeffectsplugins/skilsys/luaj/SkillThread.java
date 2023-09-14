@@ -109,7 +109,7 @@ public class SkillThread extends LuaThread {
             }
         }
         thread.inPreProcess = false;
-        
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -130,23 +130,27 @@ public class SkillThread extends LuaThread {
         thread.needStop = true;
     }
 
+    public static void HandlerLuaException(Exception e, SkillThread skillThread) {
+        if (e.getCause() != null && e.getCause().toString().trim().equals("org.clinlx.moreloreeffectsplugins.skilsys.luaj.LuaStopException: Lua Stop")) {
+            printLog("玩家‘" + skillThread.playerName + "’死亡或离开，技能[" + skillThread.skillInfo.skillName + "]效果中止");
+            if (skillThread.player.isOnline())
+                Bukkit.getPlayer(skillThread.player.getName()).sendMessage("§c§l技能[§r§e" + skillThread.skillInfo.skillName + "§c§l]效果中止");
+        } else {
+            printLog(e.getMessage());
+            printLog("玩家‘" + skillThread.playerName + "’使用技能[" + skillThread.skillInfo.skillName + "]时异常");
+            //for (StackTraceElement i : e.getStackTrace())
+            //    printLog(i.toString());
+            if (skillThread.player.isOnline())
+                Bukkit.getPlayer(skillThread.player.getName()).sendMessage(e.getMessage() + "\n§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能运行出错，请联系管理员！");
+        }
+    }
+
     @Override
     protected void StartLua() {
         try {
             luaContentChunk.call();
         } catch (Exception e) {
-            if (e.getCause().toString().trim().equals("org.clinlx.moreloreeffectsplugins.skilsys.luaj.LuaStopException: Lua Stop")) {
-                printLog("玩家‘" + playerName + "’死亡或离开，技能[" + skillInfo.skillName + "]效果中止");
-                if (player.isOnline())
-                    Bukkit.getPlayer(player.getName()).sendMessage("§c§l技能[§r§e" + skillInfo.skillName + "§c§l]效果中止");
-            } else {
-                printLog(e.getMessage());
-                printLog("玩家‘" + playerName + "’使用技能[" + skillInfo.skillName + "]时异常");
-                //for (StackTraceElement i : e.getStackTrace())
-                //    printLog(i.toString());
-                if (player.isOnline())
-                    Bukkit.getPlayer(player.getName()).sendMessage(e.getMessage() + "\n§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能运行出错，请联系管理员！");
-            }
+            HandlerLuaException(e, this);
         } finally {
             CoolDownInfo coolDownInfo = this.skillInfo.getCoolDownInfo(this.playerName);
             if (coolDownInfo != null && this.changeCoolDown) {
