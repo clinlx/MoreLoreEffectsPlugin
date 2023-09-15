@@ -1,0 +1,18 @@
+{
+    "LoreSkill.EndPreProcess": {
+       "prefix": ["EndPreProcess"],
+        "body": [
+            "--------EndPreProcess--------",
+            "$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.FinalProcess": {
+       "prefix": ["FinalProcess"],
+        "body": [
+            "--------FinalProcess--------",
+            "$0"
+        ],
+        "scope": "lua"
+    },
+}

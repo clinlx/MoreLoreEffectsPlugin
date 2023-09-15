@@ -15,8 +15,8 @@
         ],
         "scope": "lua"
     },
-    "LoreSkill.RunTask:RunTaskWithRes": {
-       "prefix": ["RunTask:RunTaskWithRes()"],
+    "LoreSkill.Unsafe:RunTaskWithRes": {
+       "prefix": ["Unsafe:RunTaskWithRes()"],
         "body": [
             "Unsafe:RunTaskWithRes(function(Api)",
             "   ${1:-- body}",

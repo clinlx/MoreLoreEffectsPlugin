@@ -121,6 +121,9 @@ public class SkillThread extends LuaThread {
                         player.sendMessage(e.getMessage());
                     player.sendMessage("§c§l[§4§lMoreLoreEffects§c§l]§r§c§l技能预处理出错，请联系管理员！");
                 }
+                //设置冷却
+                if (changeCoolDown)
+                    skillInfo.getCoolDownInfo(userName).setSkillTypeCoolDownTimeLen(0);
                 return -1;
             }
         }
