@@ -53,7 +53,7 @@ public class CheckLoreSkillCommand extends BaseCommand {
             ItemStack mainHand = player.getInventory().getItemInMainHand();
             // 如果玩家手持的物品为空, 则返回所有技能
             if (mainHand == null || mainHand.getItemMeta() == null || mainHand.getItemMeta().getLore() == null) {
-                return plugin.getSkillData().getSkillList();
+                return StartBy(args[0], plugin.getSkillData().getSkillList());
             }
             List<String> skillNameList = Tools.getItemLoreValueStr(plugin, "技能", mainHand, " ");
             List<String> cSkNameList = Tools.getItemLoreValueStr(plugin, "消耗", mainHand, " ");
