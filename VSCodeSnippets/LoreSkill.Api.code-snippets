@@ -1,0 +1,23 @@
+{
+    "LoreSkill.Api": {
+       "prefix": ["Api"],
+        "body": [
+            "Api"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Api.java": {
+       "prefix": ["Api.java"],
+        "body": [
+            "Api.java"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Api:getPlayer": {
+       "prefix": ["Api:getPlayer()"],
+        "body": [
+            "Api:getPlayer()$0"
+        ],
+        "scope": "lua"
+    },
+}

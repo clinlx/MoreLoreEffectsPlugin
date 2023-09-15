@@ -1,0 +1,54 @@
+{
+    "LoreSkill.ItemSnippets": {
+        "prefix": ["Snippets.Item"],
+        "body": [
+            "\"LoreSkill.${1:Item}\": {",
+            "   \"prefix\": [\"${1:Item}\"],",
+            "    \"body\": [",
+            "        \"${1:Item}\"",
+            "    ],",
+            "    \"scope\": \"lua\"",
+            "},$0"
+        ],
+        "scope": "snippets"
+    },
+    "LoreSkill.HeadSnippets": {
+        "prefix": ["Snippets.Head"],
+        "body": [
+            "\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$1.$2/i}\": {",
+            "   \"prefix\": [\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}\"],",
+            "    \"body\": [",
+            "        \"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}\"",
+            "    ],",
+            "    \"scope\": \"lua\"",
+            "},$0"
+        ],
+        "scope": "snippets"
+    },
+    "LoreSkill.BaseVarSnippets": {
+        "prefix": ["Snippets.Var"],
+        "body": [
+            "\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$1.$2/i}.${1:Name}\": {",
+            "   \"prefix\": [\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}.${1:Name}\"],",
+            "    \"body\": [",
+            "        \"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}.${1:Name}\\$0\"",
+            "    ],",
+            "    \"scope\": \"lua\"",
+            "},$0"
+        ],
+        "scope": "snippets"
+    },
+    "LoreSkill.BaseFuncSnippets": {
+        "prefix": ["Snippets.Func"],
+        "body": [
+            "\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$1.$2/i}:${1:Name}\": {",
+            "   \"prefix\": [\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}:${1:Name}()\"],",
+            "    \"body\": [",
+            "        \"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}:${1:Name}($2)\\$0\"",
+            "    ],",
+            "    \"scope\": \"lua\"",
+            "},$0"
+        ],
+        "scope": "snippets"
+    },
+}

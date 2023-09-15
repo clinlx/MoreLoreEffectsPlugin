@@ -41,6 +41,11 @@ public class SkillInfo {
     public void invoke(String playerName, boolean changeCoolDown) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) return;
+        if (!player.isOnline()) return;
+        if (adminOnly && !player.isOp()) {
+            player.sendMessage("§c§l你没有权限使用这个技能!");
+            return;
+        }
         if (skillCode != null) {
             // 执行Lua代码
             SkillThread.UseLuaSkill(playerName, player.getInventory().getItemInMainHand(), this, changeCoolDown);
@@ -97,6 +102,8 @@ public class SkillInfo {
     public String skillInformation = null;
     @Expose
     public boolean echoCoolDownLeftInform = true;
+    @Expose
+    public boolean adminOnly = false;
     @Expose
     public boolean cancelMouseButton = true;
     @Expose

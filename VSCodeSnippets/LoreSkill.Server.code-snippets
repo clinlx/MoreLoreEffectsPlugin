@@ -1,0 +1,57 @@
+{
+    "LoreSkill.Server": {
+        "prefix": [
+            "Server"
+        ],
+        "body": [
+            "Server"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Server:Log": {
+       "prefix": ["Server:Log()"],
+        "body": [
+            "Server:Log(\"$1\")$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Server:Wait": {
+       "prefix": ["Server:Wait()"],
+        "body": [
+            "Server:Wait(${1:millisecond})$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Server:Command": {
+        "prefix": [
+            "Server:Command()"
+        ],
+        "body": [
+            "Server:Command(\"$1\")$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:CommandWithRes": {
+        "prefix": [
+            "Server:CommandWithRes()"
+        ],
+        "body": [
+            "Server:CommandWithRes(\"$1\")$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Server:buildWorldPos": {
+       "prefix": ["Server:buildWorldPos()"],
+        "body": [
+            "Server:buildWorldPos(${1|worldPos,location,worldName\\,x\\,y\\,z,worldName\\,x\\,y\\,z\\,yaw\\,pitch|})$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Server:DrawParticle": {
+       "prefix": ["Server:DrawParticle()"],
+        "body": [
+            "Server:DrawParticle(${1:particleName},${2:p_num},${3:worldPos},${4:range_x},${5:range_y},${6:range_z})$0"
+        ],
+        "scope": "lua"
+    },
+}

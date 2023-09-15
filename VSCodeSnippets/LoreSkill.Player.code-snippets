@@ -1,0 +1,115 @@
+{
+    "LoreSkill.Player": {
+        "prefix": ["Player"],
+        "body": [
+            "Player"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:Inform": {
+       "prefix": ["Player:Inform()"],
+        "body": [
+            "Player:Inform(\"$1\")$0"
+        ],
+        "scope": "lua"
+    },
+	"LoreSkill.Player:Command": {
+        "prefix": ["Player:Command()"],
+        "body": [
+            "Player:Command(\"$1\")$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:CommandWithRes": {
+       "prefix": ["Player:CommandWithRes()"],
+        "body": [
+            "Player:CommandWithRes(\"$1\")$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:Teleport": {
+       "prefix": ["Player:Teleport()"],
+        "body": [
+            "Player:Teleport(${1|worldPos,x\\,y\\,z|})$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getName": {
+       "prefix": ["Player:getName()"],
+        "body": [
+            "Player:getName()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getWorldName": {
+       "prefix": ["Player:getWorldName()"],
+        "body": [
+            "Player:getWorldName()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getX": {
+       "prefix": ["Player:getX()"],
+        "body": [
+            "Player:getX()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getY": {
+       "prefix": ["Player:getY()"],
+        "body": [
+            "Player:getY()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getZ": {
+       "prefix": ["Player:getZ()"],
+        "body": [
+            "Player:getZ()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getYaw": {
+       "prefix": ["Player:getYaw()"],
+        "body": [
+            "Player:getYaw()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getPitch": {
+       "prefix": ["Player:getPitch()"],
+        "body": [
+            "Player:getPitch()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getWorldPos": {
+       "prefix": ["Player:getWorldPos()"],
+        "body": [
+            "Player:getWorldPos()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getMaxHealth": {
+       "prefix": ["Player:getMaxHealth()"],
+        "body": [
+            "Player:getMaxHealth()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:getHealth": {
+       "prefix": ["Player:getHealth()"],
+        "body": [
+            "Player:getHealth()$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Player:setHealth": {
+       "prefix": ["Player:setHealth()"],
+        "body": [
+            "Player:setHealth()$0"
+        ],
+        "scope": "lua"
+    },
+    
+}

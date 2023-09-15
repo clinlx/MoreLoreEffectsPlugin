@@ -21,6 +21,15 @@ public class SkillLuaApi {
             return new Location(world, worldPos.x, worldPos.y, worldPos.z, worldPos.yaw, worldPos.pitch);
         }
 
+        public WorldPos(WorldPos source) {
+            this.worldName = source.worldName;
+            this.x = source.x;
+            this.y = source.y;
+            this.z = source.z;
+            this.pitch = source.pitch;
+            this.yaw = source.yaw;
+        }
+
         public WorldPos(Location location) {
             this.worldName = location.getWorld().getName();
             this.x = location.getX();
@@ -135,6 +144,8 @@ public class SkillLuaApi {
             } catch (Exception ce) {
                 throw new LuaStopException("Lua Stop");
             }
+            if (!skillThreadAlive(id))
+                throw new LuaStopException("Lua Stop");
             if (hasReturn == 1) {
                 return (T) retObj;
             } else if (hasReturn == -1024) {
@@ -184,6 +195,10 @@ public class SkillLuaApi {
         }
 
         //构造WorldPos
+        public WorldPos buildWorldPos(WorldPos worldPos) {
+            return new WorldPos(worldPos);
+        }
+
         public WorldPos buildWorldPos(Location location) {
             return new WorldPos(location);
         }
@@ -253,6 +268,7 @@ public class SkillLuaApi {
         }
 
         //TODO:随时开关隐藏右键提示冷却等待文本的功能
+        //TODO:使用另一个Lua技能(多线程的替代品)
     }
 
     public static class PlayerApi {
@@ -262,6 +278,46 @@ public class SkillLuaApi {
         public PlayerApi(String userName, long id) {
             this.id = id;
             player = Bukkit.getPlayer(userName);
+        }
+
+        public void Inform(String message) throws LuaStopException {
+            ensureThreadAlive(id);
+            player.sendMessage(message);
+        }
+
+        public void Command(String cmd) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                Bukkit.dispatchCommand(player, cmd);
+            }, id);
+        }
+
+        //阻塞直到获取返回值
+        public boolean CommandWithRes(String cmd) throws LuaStopException {
+            ensureThreadAlive(id);
+            try {
+                return callInBukkitBlock(() -> {
+                    return Bukkit.dispatchCommand(player, cmd);
+                }, id);
+            } catch (Exception ignored) {
+                return false;
+            }
+        }
+
+        public void Teleport(WorldPos worldPos) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                Location pos = WorldPos.getBukkitLocation(worldPos);
+                if (pos == null) return;
+                player.teleport(pos);
+            }, id);
+        }
+
+        public void Teleport(double x, double y, double z) throws LuaStopException {
+            ensureThreadAlive(id);
+            callInBukkit(() -> {
+                player.teleport(new Location(player.getWorld(), x, y, z));
+            }, id);
         }
 
         //获取玩家名
@@ -306,47 +362,15 @@ public class SkillLuaApi {
             return new WorldPos(location.getWorld().getName(), location.getX(), location.getY(), location.getZ(), location.getPitch(), location.getYaw());
         }
 
-        public void Inform(String message) throws LuaStopException {
+        public double getMaxHealth() throws LuaStopException {
             ensureThreadAlive(id);
-            player.sendMessage(message);
+            return player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue();
         }
 
-        public void Command(String cmd) throws LuaStopException {
-            ensureThreadAlive(id);
-            callInBukkit(() -> {
-                Bukkit.dispatchCommand(player, cmd);
-            }, id);
-        }
-
-        //阻塞直到获取返回值
-        public boolean CommandWithRes(String cmd) throws LuaStopException {
-            ensureThreadAlive(id);
-            try {
-                return callInBukkitBlock(() -> {
-                    return Bukkit.dispatchCommand(player, cmd);
-                }, id);
-            } catch (Exception ignored) {
-                return false;
-            }
-        }
-
-        public void Teleport(WorldPos worldPos) throws LuaStopException {
-            ensureThreadAlive(id);
-            callInBukkit(() -> {
-                Location pos = WorldPos.getBukkitLocation(worldPos);
-                if (pos == null) return;
-                player.teleport(pos);
-            }, id);
-        }
 
         public double getHealth() throws LuaStopException {
             ensureThreadAlive(id);
             return player.getHealth();
-        }
-
-        public double getMaxHealth() throws LuaStopException {
-            ensureThreadAlive(id);
-            return player.getAttribute(org.bukkit.attribute.Attribute.GENERIC_MAX_HEALTH).getValue();
         }
 
         public void setHealth(double value) throws LuaStopException {
