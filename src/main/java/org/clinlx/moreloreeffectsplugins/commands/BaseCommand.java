@@ -14,6 +14,10 @@ public class BaseCommand implements CommandExecutor, TabExecutor {
 
     protected static final List<String> emptyList = new ArrayList<>();
 
+    protected static List<String> StartBy(String str, List<String> list) {
+        return list.stream().filter(s -> s.startsWith(str)).collect(ArrayList::new, ArrayList::add, ArrayList::addAll);
+    }
+
     public BaseCommand(MoreLoreEffectsPlugin plugin) {
         this.plugin = plugin;
     }

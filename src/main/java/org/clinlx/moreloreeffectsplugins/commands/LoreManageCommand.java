@@ -87,15 +87,15 @@ public class LoreManageCommand extends BaseCommand {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return Arrays.asList("add", "copy", "paste", "clear");
+            return StartBy(args[0], Arrays.asList("add", "copy", "paste", "clear"));
         } else if (args[0].equals("add")) {
             if (args.length == 2) {
-                return ListLoreCommand.getLoreList();
+                return StartBy(args[1], ListLoreCommand.getLoreList());
             } else if (args.length == 3) {
                 if (args[1].equals("技能") || args[1].equals("消耗") || args[1].equals("攻击特效")) {
-                    return plugin.getSkillData().getSkillList();
+                    return StartBy(args[2], plugin.getSkillData().getSkillList());
                 }
-                return Arrays.asList("0", "+0", "+0%");
+                return StartBy(args[2], Arrays.asList("0", "+0", "+0%"));
             }
         }
         return emptyList;

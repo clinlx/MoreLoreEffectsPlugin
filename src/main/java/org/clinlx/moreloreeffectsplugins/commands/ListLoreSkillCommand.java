@@ -48,7 +48,7 @@ public class ListLoreSkillCommand extends BaseCommand {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return plugin.getSkillData().tpyeList;
+            return StartBy(args[0], plugin.getSkillData().tpyeList);
         } else return emptyList;
     }
 }

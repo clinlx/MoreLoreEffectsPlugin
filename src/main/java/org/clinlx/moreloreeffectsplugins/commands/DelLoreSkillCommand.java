@@ -43,7 +43,7 @@ public class DelLoreSkillCommand extends BaseCommand {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return plugin.getSkillData().getSkillList();
+            return StartBy(args[0], plugin.getSkillData().getSkillList());
         } else
             return emptyList;
     }

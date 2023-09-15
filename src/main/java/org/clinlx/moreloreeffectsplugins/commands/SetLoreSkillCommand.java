@@ -56,13 +56,13 @@ public class SetLoreSkillCommand extends BaseCommand {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {
-            return plugin.getSkillData().getSkillList();
+            return StartBy(args[0], plugin.getSkillData().getSkillList());
         } else if (args.length == 2) {
-            return plugin.getSkillData().tpyeList;
+            return StartBy(args[1], plugin.getSkillData().tpyeList);
         } else if (args.length == 3) {
-            return Arrays.asList("无穷大", "0", "1000", "3000", "5000", "7000", "9000");
+            return StartBy(args[2], Arrays.asList("无穷大", "0", "1000", "3000", "5000", "7000", "9000"));
         } else if (args.length == 4) {
-            return Arrays.asList("effect", "tp", "say");
+            return StartBy(args[3], Arrays.asList("effect", "tp", "say"));
         } else if (args.length > 4) {
             try {
                 int cutLength = 4;

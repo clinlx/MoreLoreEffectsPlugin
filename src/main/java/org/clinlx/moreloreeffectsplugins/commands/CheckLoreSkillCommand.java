@@ -47,6 +47,7 @@ public class CheckLoreSkillCommand extends BaseCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length != 1) return emptyList;
         if (sender instanceof Player) {
             Player player = (Player) sender;
             ItemStack mainHand = player.getInventory().getItemInMainHand();
@@ -63,7 +64,7 @@ public class CheckLoreSkillCommand extends BaseCommand {
             set.addAll(cSkNameList);
             set.addAll(aSkNameList);
             // 将 Set 转换为 List 并返回
-            return new ArrayList<>(set);
+            return StartBy(args[0], new ArrayList<>(set));
         }
         return emptyList;
     }

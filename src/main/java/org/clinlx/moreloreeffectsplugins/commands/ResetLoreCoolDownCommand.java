@@ -60,11 +60,14 @@ public class ResetLoreCoolDownCommand extends BaseCommand {
         if (args.length == 1) {
             //补全玩家名
             List<String> playerNames = new ArrayList<>();
-            Bukkit.getOnlinePlayers().forEach(player -> playerNames.add(player.getName()));
+            Bukkit.getOnlinePlayers().forEach(player -> {
+                if (player.getName().startsWith(args[0]))
+                    playerNames.add(player.getName());
+            });
             return playerNames;
         } else if (args.length == 2) {
             //补全技能名
-            return plugin.getSkillData().getSkillList();
+            return StartBy(args[1], plugin.getSkillData().getSkillList());
         }
         return emptyList;
     }
