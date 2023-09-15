@@ -70,6 +70,23 @@ public class SkillLuaApi {
             return new WorldPos(worldName, x + dx, y + dy, z + dz, pitch, yaw);
         }
 
+        public WorldPos getHeadForwardPosBlocked(double distance) {
+            //循环，每次递进，直到遇见方块
+            WorldPos pos = new WorldPos(this);
+            double step = 0.25;
+            while (distance > 0) {
+                WorldPos nextPos = pos.getHeadForwardPos(step);
+                Location nextLoc = WorldPos.getBukkitLocation(nextPos);
+                if (nextLoc == null) return null;
+                if (nextLoc.getBlock().getType().isSolid()) {
+                    return pos;
+                }
+                pos = nextPos;
+                distance -= step;
+            }
+            return pos;
+        }
+
         public WorldPos localPosToWorld(WorldPos localPos) {
             double x = this.x + localPos.x * Math.cos(Math.toRadians(this.yaw)) - localPos.z * Math.sin(Math.toRadians(this.yaw));
             double z = this.z + localPos.x * Math.sin(Math.toRadians(this.yaw)) + localPos.z * Math.cos(Math.toRadians(this.yaw));
