@@ -11,7 +11,6 @@ import java.util.List;
 public class SkillCode {
     public SkillCode() {
         String apiClassName = SkillLuaApi.class.getName();
-        //TODO:FinalProcess,用于实现Unsafe被线程强行Stop后的安全处理
         luaHead =
                 "CALLER_NAME = select(1, ...);\n" +
                         "CALL_BODY_ID = select(2, ...);\n" +
@@ -22,37 +21,49 @@ public class SkillCode {
                         "CALLER_NAME = nil;CALL_BODY_ID = nil;luajava = nil;\n";//luajava.bindClass
         preProcess = "";
         codeBody = "";
+        finalProcess = "";
     }
 
     public boolean LoadFromLuaFile(String luaPath) {
         StringBuilder preProcess = new StringBuilder();
         StringBuilder luaBody = new StringBuilder();
+        StringBuilder finalProcess = new StringBuilder();
         try {
             BufferedReader reader = new BufferedReader(new FileReader(luaPath));
             List<String> stringList = new ArrayList<>();
             String line;
-            boolean isPreProcess = true;
+            int processState = 0;
             while ((line = reader.readLine()) != null) {
                 if (line.trim().equals("--------EndPreProcess--------")) {
-                    isPreProcess = false;
-                    luaBody.append("\n");
-                    continue;
+                    if (processState != 0)
+                        throw new IOException("EndPreProcess Error");
+                    processState = 1;
                 }
-                if (isPreProcess) {
+                if (line.trim().equals("--------FinalProcess--------")) {
+                    if (processState != 1)
+                        throw new IOException("FinalProcess Error");
+                    processState = 2;
+                }
+                if (processState == 0) {
                     preProcess.append(line).append("\n");
                     luaBody.append("\n");
-                } else {
+                    finalProcess.append("\n");
+                } else if (processState == 1) {
                     luaBody.append(line).append("\n");
+                    finalProcess.append("\n");
+                } else if (processState == 2) {
+                    finalProcess.append(line).append("\n");
                 }
             }
-            if (isPreProcess) {
-                StringBuilder temp = luaBody;
-                luaBody = preProcess;
-                preProcess = temp;
-            }
             reader.close();
+            if (processState == 0) {
+                luaBody = preProcess;
+                preProcess = new StringBuilder();
+                finalProcess = new StringBuilder();
+            }
             this.preProcess = preProcess.toString();
             this.codeBody = luaBody.toString();
+            this.finalProcess = finalProcess.toString();
         } catch (IOException e) {
             return false;
         }
@@ -60,6 +71,21 @@ public class SkillCode {
     }
 
     public final String luaHead;
-    public String preProcess;
-    public String codeBody;
+    private String preProcess;
+
+    public String getPreProcess() {
+        return preProcess;
+    }
+
+    private String codeBody;
+
+    public String getCodeBody() {
+        return codeBody;
+    }
+
+    private String finalProcess;
+
+    public String getFinalProcess() {
+        return finalProcess;
+    }
 }

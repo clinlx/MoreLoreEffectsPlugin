@@ -209,9 +209,11 @@ public class SkillData {
                     if (!luaFile.createNewFile()) return false;
                 }
                 java.io.FileWriter writer = new java.io.FileWriter(luaFile);
-                writer.write(skillInfo.skillCode.preProcess.trim());
+                writer.write(skillInfo.skillCode.getPreProcess().trim());
                 writer.write("\n--------EndPreProcess--------\n");
-                writer.write(skillInfo.skillCode.codeBody.trim());
+                writer.write(skillInfo.skillCode.getCodeBody().trim());
+                writer.write("\n--------FinalProcess--------\n");
+                writer.write(skillInfo.skillCode.getFinalProcess().trim());
                 writer.close();
             } catch (Exception e) {
                 return false;

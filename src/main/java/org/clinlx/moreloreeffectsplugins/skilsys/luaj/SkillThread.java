@@ -66,7 +66,7 @@ public class SkillThread extends LuaThread {
     public volatile int hasReturn = 0;
 
     private SkillThread(String userName, ItemStack item, SkillInfo skillInfo, boolean changeCoolDown) {
-        super(skillInfo.skillCode.luaHead, skillInfo.skillCode.preProcess, skillInfo.skillCode.codeBody);
+        super(skillInfo.skillCode.luaHead, skillInfo.skillCode.getPreProcess(), skillInfo.skillCode.getCodeBody(), skillInfo.skillCode.getFinalProcess());
         //设置
         this.playerName = userName;
         this.player = Bukkit.getPlayer(userName);
@@ -107,7 +107,7 @@ public class SkillThread extends LuaThread {
             skillInfo.getCoolDownInfo(userName).useSkillTypeCoolDown(CoolDownInfo.runningSign);
 
         //运行预处理部分
-        if (!skillInfo.skillCode.preProcess.trim().isEmpty()) {
+        if (!skillInfo.skillCode.getPreProcess().trim().isEmpty()) {
             try {
                 thread.preProcessChunk.call();
             } catch (Exception e) {
@@ -176,6 +176,11 @@ public class SkillThread extends LuaThread {
         } catch (Exception e) {
             HandlerLuaException(e, this);
         } finally {
+            try {
+                finalProcessChunk.call();
+            } catch (Exception e) {
+                HandlerLuaException(e, this);
+            }
             CoolDownInfo coolDownInfo = this.skillInfo.getCoolDownInfo(this.playerName);
             if (coolDownInfo != null && this.changeCoolDown) {
                 if (coolDownInfo.getWaitTime() == CoolDownInfo.runningSign) {

@@ -9,9 +9,10 @@ public abstract class LuaThread extends Thread {
     protected final LuaValue luaHeadChunk;
     protected final LuaValue preProcessChunk;
     protected final LuaValue luaContentChunk;
+    protected final LuaValue finalProcessChunk;
     public volatile boolean needStop = false;
 
-    protected LuaThread(String luaHead, String preProcess, String luaContent) {
+    protected LuaThread(String luaHead, String preProcess, String luaContent, String finalProcess) {
         //初始化lua运行时环境
         globals = JsePlatformCopy.getGlobals();
         //通过Globals加载luaHead
@@ -20,6 +21,8 @@ public abstract class LuaThread extends Thread {
         preProcessChunk = globals.load(preProcess);
         //通过Globals加载lua脚本
         luaContentChunk = globals.load(luaContent);
+        //通过Globals加载finalProcess
+        finalProcessChunk = globals.load(finalProcess);
     }
 
     @Override
@@ -34,7 +37,16 @@ public abstract class LuaThread extends Thread {
             printLog(e.getMessage());
             for (StackTraceElement i : e.getStackTrace())
                 printLog(i.toString());
+        } finally {
+            try {
+                finalProcessChunk.call();
+            } catch (Exception e) {
+                printLog(e.getMessage());
+                for (StackTraceElement i : e.getStackTrace())
+                    printLog(i.toString());
+            }
         }
+
     }
 
     protected static void printLog(String message) {
