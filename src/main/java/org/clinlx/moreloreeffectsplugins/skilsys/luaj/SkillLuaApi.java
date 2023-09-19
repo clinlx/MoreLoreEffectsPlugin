@@ -283,8 +283,6 @@ public class SkillLuaApi {
                 }
             }, id);
         }
-
-        //TODO:随时开关隐藏右键提示冷却等待文本的功能
         //TODO:使用另一个Lua技能(多线程的替代品)
     }
 
