@@ -10,7 +10,7 @@ commands:
     #描述这个命令
     description: "查看某个Lore技能的描述. 别名:/clsk"
     #用法
-    usage: "/listlore <技能名>  §7§l查看某个Lore技能的描述\n"
+    usage: "/checkloreskill <技能名>  §7§l查看某个Lore技能的描述\n"
     #没有权限的提示消息
     permission-message: "无权使用"
   listlore:
