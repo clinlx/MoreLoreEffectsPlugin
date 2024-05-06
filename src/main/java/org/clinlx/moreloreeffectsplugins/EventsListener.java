@@ -40,38 +40,57 @@ public class EventsListener implements Listener {
         return Tools.getItemLoreValueDoubleSum(mainPlugin, key, item);
     }
 
-    private boolean wrongLevelLimit(MoreLoreEffectsPlugin plugin, HumanEntity entity, int itemKind, ItemStack item, Cancellable event, boolean playerIsAtk) {
+    private boolean wrongLevelLimit(MoreLoreEffectsPlugin plugin, HumanEntity entity, int itemKind, ItemStack item, Cancellable event, boolean playerIsAtk, boolean tryDrop) {
         //非玩家跳过检测
         if (!(entity instanceof Player)) return false;
         Player player = (Player) entity;
         if (Tools.getItemLoreValueDoubleMax(plugin, "等级限制", item) > player.getLevel()) {
-            player.sendMessage("[提示]§4你觉得自己现有的等级驾驭不住“§e" + (item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : (item.getItemMeta().hasLocalizedName() ? item.getItemMeta().getLocalizedName() : item.getType().name())) + "§4”的力量，一开始战斗，它便§5从你身上滑落§4。");
-            player.getWorld().dropItem(player.getLocation(), item);
-            switch (itemKind) {
-                case -1:
-                    break;
-                case 0:
-                    player.getInventory().setHelmet(null);
-                    break;
-                case 1:
-                    player.getInventory().setChestplate(null);
-                    break;
-                case 2:
-                    player.getInventory().setLeggings(null);
-                    break;
-                case 3:
-                    player.getInventory().setBoots(null);
-                    break;
-                case 4:
-                    player.getInventory().setItemInMainHand(null);
-                    break;
-                case 5:
-                    player.getInventory().setItemInOffHand(null);
-                    break;
-            }
-            //玩家如果是攻击者，取消攻击事件
-            if (playerIsAtk) {
-                event.setCancelled(true);
+            if (tryDrop) {
+                player.sendMessage("[提示]§4你觉得自己现有的等级驾驭不住“§e" + (item.getItemMeta().hasDisplayName() ? item.getItemMeta().getDisplayName() : (item.getItemMeta().hasLocalizedName() ? item.getItemMeta().getLocalizedName() : item.getType().name())) + "§4”的力量，一开始战斗，它便§5从你身上滑落§4。");
+                switch (itemKind) {
+                    case -1:
+                        break;
+                    case 0:
+                        if (player.getInventory().getHelmet() != null) {
+                            player.getInventory().setHelmet(null);
+                            player.getWorld().dropItem(player.getLocation(), item);
+                        }
+                        break;
+                    case 1:
+                        if (player.getInventory().getChestplate() != null) {
+                            player.getInventory().setChestplate(null);
+                            player.getWorld().dropItem(player.getLocation(), item);
+                        }
+                        break;
+                    case 2:
+                        if (player.getInventory().getLeggings() != null) {
+                            player.getInventory().setLeggings(null);
+                            player.getWorld().dropItem(player.getLocation(), item);
+                        }
+                        break;
+                    case 3:
+                        if (player.getInventory().getBoots() != null) {
+                            player.getInventory().setBoots(null);
+                            player.getWorld().dropItem(player.getLocation(), item);
+                        }
+                        break;
+                    case 4:
+                        if (player.getInventory().getItemInMainHand() != null) {
+                            player.getInventory().setItemInMainHand(null);
+                            player.getWorld().dropItem(player.getLocation(), item);
+                        }
+                        break;
+                    case 5:
+                        if (player.getInventory().getItemInOffHand() != null) {
+                            player.getInventory().setItemInOffHand(null);
+                            player.getWorld().dropItem(player.getLocation(), item);
+                        }
+                        break;
+                }
+                //玩家如果是攻击者，取消攻击事件
+                if (playerIsAtk) {
+                    event.setCancelled(true);
+                }
             }
             return true;
         }
@@ -106,15 +125,15 @@ public class EventsListener implements Listener {
             ItemStack mainHandItem = equipments[4];
             ItemStack offHandItem = equipments[5];
             //触发主手攻击特效
-            if (!wrongLevelLimit(mainPlugin, damagerPlayer, 4, mainHandItem, event, true)) {
-                //TODO: 触发主手攻击特效(和技能基本类似但是临时可以设置Lore属性的乘数或绝对值)
-
-            }
+//            if (!wrongLevelLimit(mainPlugin, damagerPlayer, 4, mainHandItem, event, true, false)) {
+//                //TODO: 触发主手攻击特效(和技能基本类似但是临时可以设置Lore属性的乘数或绝对值)
+//
+//            }
             //计算不同装备数值和
             for (int i = 0; i < 6; i++) {
                 ItemStack item = equipments[i];
                 //不满足等级要求的部位强制掉落
-                if (wrongLevelLimit(mainPlugin, damagerPlayer, i, item, event, true))
+                if (wrongLevelLimit(mainPlugin, damagerPlayer, i, item, event, true, true))
                     continue;
                 //统计装备属性
                 incDmgSum += getValueDouble("攻击力", item);
@@ -210,7 +229,7 @@ public class EventsListener implements Listener {
             for (int i = 0; i < 6; i++) {
                 ItemStack item = equipments[i];
                 //不满足等级要求的部位强制掉落
-                if (wrongLevelLimit(mainPlugin, targetPlayer, i, item, event, false))
+                if (wrongLevelLimit(mainPlugin, targetPlayer, i, item, event, false, true))
                     continue;
                 //统计装备属性
                 recDmgSum += getValueDouble("减伤", item);
@@ -334,7 +353,7 @@ public class EventsListener implements Listener {
         boolean isMainHand = event.getItem().equals(mainItem);
         ////左右键均可部分
         //不满足等级要求的部位强制掉落
-        if (wrongLevelLimit(mainPlugin, player, event.getItem().equals(mainItem) ? 4 : 5, event.getItem(), event, true)) {
+        if (wrongLevelLimit(mainPlugin, player, event.getItem().equals(mainItem) ? 4 : 5, event.getItem(), event, true, true)) {
             return;
         }
         //如果按右键
