@@ -124,22 +124,24 @@ public class EventsListener implements Listener {
             ItemStack[] equipments = Tools.getPlayerAllEquipments(damagerPlayer);
             ItemStack mainHandItem = equipments[4];
             ItemStack offHandItem = equipments[5];
-            //触发主手攻击特效
-//            if (!wrongLevelLimit(mainPlugin, damagerPlayer, 4, mainHandItem, event, true, false)) {
-//                //TODO: 触发主手攻击特效(和技能基本类似但是临时可以设置Lore属性的乘数或绝对值)
-//
-//            }
             //计算不同装备数值和
+            boolean levelRight = true;
             for (int i = 0; i < 6; i++) {
                 ItemStack item = equipments[i];
                 //不满足等级要求的部位强制掉落
-                if (wrongLevelLimit(mainPlugin, damagerPlayer, i, item, event, true, true))
+                if (wrongLevelLimit(mainPlugin, damagerPlayer, i, item, event, true, true)) {
+                    levelRight = false;
                     continue;
+                }
                 //统计装备属性
                 incDmgSum += getValueDouble("攻击力", item);
                 incDmgPrgSum += getValueDouble("百分比攻击", item);
                 whackChance += getValueDouble("暴击率", item);
                 extraWhackDamage += getValueDouble("暴击伤害", item);
+            }
+            if (!levelRight) {
+                event.setCancelled(true);
+                return;
             }
             //仅主手起效
             healNumSum += getValueDouble("吸血", mainHandItem);
@@ -213,6 +215,54 @@ public class EventsListener implements Listener {
             //蓄力不满的减伤
             if (prgFromBase < 0.95) {
                 newDmg *= prgFromBase;
+            } else {
+                if (damagerPlayer instanceof Player) {
+                    Player player = (Player) damagerPlayer;
+                    String playerName = player.getName();
+                    //TODO: 蓄力满的加成
+                    //触发主手攻击特效
+                    //TODO: 触发主手攻击特效(和技能基本类似但是临时可以设置Lore属性的乘数或绝对值)
+                    //获取物品的技能词条
+                    List<String> skillNameList = Tools.getItemLoreValueStr(mainPlugin, "攻击特效", mainHandItem, " ");
+                    //确认物品有技能词条
+                    if (skillNameList == null || skillNameList.size() == 0)
+                        return;
+                    //是否禁止物品右键事件触发
+                    boolean cancelButton = false;
+                    //遍历触发每一个技能
+                    for (String skillName : skillNameList) {
+                        //确认这个技能存在
+                        if (mainPlugin.getSkillData().skillExist(skillName)) {
+                            //获取技能信息
+                            SkillInfo skillInfo = mainPlugin.getSkillData().getSkill(skillName);
+                            //确认是否取消按键
+                            if (skillInfo.cancelMouseButton)
+                                cancelButton = true;
+                            //确认技能CD
+                            if (skillInfo.getCoolDownInfo(playerName).skillTypeReady()) {
+                                //触发技能
+                                skillInfo.invoke(playerName, true);
+                                //TODO: 增加字段，触发时是否提醒
+                                player.sendMessage("触发攻击特效[§e" + skillName + "§r]");
+                            } else {
+                                //技能在CD
+                                if (System.currentTimeMillis() - skillInfo.getCoolDownInfo(playerName).getLastUseTime() >= 10
+                                        && skillInfo.echoCoolDownLeftInform) {
+                                    if (skillInfo.getCoolDownInfo(playerName).getWaitTime() == CoolDownInfo.runningSign) {
+                                        //player.sendMessage("");
+                                    } else {
+                                        player.sendMessage("§4在触发攻击特效[§e" + skillName + "§r§4]前还需要等待" + skillInfo.getCoolDownInfo(playerName).getWaitTimeStr() + "§4的时间！");
+                                    }
+                                }
+                            }
+                        } else {
+                            //技能不存在
+                            player.sendMessage("攻击特效[§e" + skillName + "§r]的效果不存在！");
+                        }
+                    }
+                    //设置物品右键事件触发情况
+                    event.setCancelled(cancelButton);
+                }
             }
         }
         //受击者为类人
@@ -399,6 +449,7 @@ public class EventsListener implements Listener {
                     if (skillInfo.getCoolDownInfo(playerName).skillTypeReady()) {
                         //触发技能
                         skillInfo.invoke(playerName, true);
+                        //TODO: 增加字段，触发时是否提醒
                         player.sendMessage("触发" + (readyConsume ? "消耗" : "") + "技能[§e" + skillName + "§r]");
                     } else {
                         //技能在CD
@@ -406,8 +457,9 @@ public class EventsListener implements Listener {
                                 && skillInfo.echoCoolDownLeftInform) {
                             if (skillInfo.getCoolDownInfo(playerName).getWaitTime() == CoolDownInfo.runningSign) {
                                 //player.sendMessage("");
-                            } else
-                                player.sendMessage("§4在使用技能[§e" + skillName + "§r§4]前还需要等待" + skillInfo.getCoolDownInfo(playerName).getWaitTimeStr() + "§4的时间！");
+                            } else {
+                                player.sendMessage("§4在使用" + (readyConsume ? "消耗" : "") + "技能[§e" + skillName + "§r§4]前还需要等待" + skillInfo.getCoolDownInfo(playerName).getWaitTimeStr() + "§4的时间！");
+                            }
                         }
                     }
                 } else {

@@ -7,6 +7,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin;
+import org.clinlx.moreloreeffectsplugins.skilsys.SkillDataJsonSaver;
 import org.clinlx.moreloreeffectsplugins.skilsys.SkillInfo;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
@@ -241,6 +242,35 @@ public class SkillLuaApi {
                 world.spawnParticle(Particle.valueOf(particleName), pos, p_num, r_x, r_y, r_z);
             }, id);
         }
+
+        //数据存储
+        private String buildSaveDataDir() {
+            return "ServerSaveData";
+        }
+
+        private String buildSaveDataKey(String key) {
+            return key.replaceAll("[\\\\/:*?\"<>|]", "~");
+        }
+
+        public void SetSaveData(String key, Object luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            SkillDataJsonSaver.saveSkillData(buildSaveDataDir(), buildSaveDataKey(key), luaValue);
+        }
+
+        public Object GetSaveData(String key) throws LuaStopException {
+            ensureThreadAlive(id);
+            return SkillDataJsonSaver.loadSkillData(buildSaveDataDir(), buildSaveDataKey(key));
+        }
+
+        public Object AddSaveData(String key, Object luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            return SkillDataJsonSaver.AddSkillData(buildSaveDataDir(), buildSaveDataKey(key), luaValue);
+        }
+
+        public void LockSaveData(String key, LuaValue luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            SkillDataJsonSaver.LockSkillData(buildSaveDataDir(), buildSaveDataKey(key), luaValue);
+        }
     }
 
     public static class SkillApi {
@@ -396,6 +426,35 @@ public class SkillLuaApi {
         }
 
         //TODO:更多API，如修改属性
+
+        //数据存储
+        private String buildSaveDataDir() {
+            return "PlayerSaveData/" + player.getName();
+        }
+
+        private String buildSaveDataKey(String key) {
+            return key.replaceAll("[\\\\/:*?\"<>|]", "~");
+        }
+
+        public void SetSaveData(String key, Object luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            SkillDataJsonSaver.saveSkillData(buildSaveDataDir(), buildSaveDataKey(key), luaValue);
+        }
+
+        public Object GetSaveData(String key) throws LuaStopException {
+            ensureThreadAlive(id);
+            return SkillDataJsonSaver.loadSkillData(buildSaveDataDir(), buildSaveDataKey(key));
+        }
+
+        public Object AddSaveData(String key, Object luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            return SkillDataJsonSaver.AddSkillData(buildSaveDataDir(), buildSaveDataKey(key), luaValue);
+        }
+
+        public void LockSaveData(String key, LuaValue luaValue) throws LuaStopException {
+            ensureThreadAlive(id);
+            SkillDataJsonSaver.LockSkillData(buildSaveDataDir(), buildSaveDataKey(key), luaValue);
+        }
     }
 
     public static class UnsafeArea {

@@ -10,6 +10,7 @@ public class CoolDownSys {
 
     private final HashMap<String, CoolDownInfo> skillTypeCoolDownInfo;
 
+    //TODO: 数据持久化
     public CoolDownInfo getTypeCoolDownInfo(String skillType) {
         synchronized (skillTypeCoolDownInfo) {
             if (!skillTypeCoolDownInfo.containsKey(skillType)) {
