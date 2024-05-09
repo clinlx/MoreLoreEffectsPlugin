@@ -7,6 +7,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin;
 import org.clinlx.moreloreeffectsplugins.skilsys.CoolDownInfo;
 import org.clinlx.moreloreeffectsplugins.skilsys.SkillInfo;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class SkillThread extends LuaThread {
     public volatile Object returnObj = null;
     public volatile int hasReturn = 0;
 
-    private SkillThread(String userName, ItemStack item, SkillInfo skillInfo, boolean changeCoolDown) {
+    private SkillThread(String userName, ItemStack item, SkillInfo skillInfo, boolean changeCoolDown, LuaTable luaParam) {
         super(skillInfo.skillCode.luaHead, skillInfo.skillCode.getPreProcess(), skillInfo.skillCode.getCodeBody(), skillInfo.skillCode.getFinalProcess());
         //设置
         this.playerName = userName;
@@ -74,10 +75,10 @@ public class SkillThread extends LuaThread {
         this.skillInfo = skillInfo;
         this.changeCoolDown = changeCoolDown;
         //通过Globals加载luaHead
-        luaHeadChunk.call(LuaValue.valueOf(userName), LuaValue.valueOf(getId()));
+        luaHeadChunk.call(LuaValue.valueOf(userName), LuaValue.valueOf(getId()), luaParam);
     }
 
-    public static long UseLuaSkill(String userName, ItemStack item, SkillInfo skillInfo, boolean changeCoolDown) {
+    public static long UseLuaSkill(String userName, ItemStack item, SkillInfo skillInfo, boolean changeCoolDown, LuaTable luaParam) {
         if (userName == null || item == null || skillInfo == null || skillInfo.skillCode == null) {
             printLog("UseLuaSkill参数错误");
             return -1;
@@ -88,7 +89,7 @@ public class SkillThread extends LuaThread {
         //创建线程,技能初始化
         SkillThread thread;
         try {
-            thread = new SkillThread(userName, item, skillInfo, changeCoolDown);
+            thread = new SkillThread(userName, item, skillInfo, changeCoolDown, luaParam);
         } catch (Exception e) {
             printLog(e.getMessage());
             Player player = Bukkit.getPlayer(userName);

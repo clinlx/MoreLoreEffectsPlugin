@@ -54,16 +54,19 @@ public class SkillDataJsonSaver {
         synchronized (lockStr) {
             Gson gson = new GsonBuilder().create();
             File file = new File(dir, key + ".json");
+            if (!file.exists()) {
+                return null;
+            }
             try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                if (!file.exists()) {
-                    return null;
-                }
                 String line;
                 StringBuilder content = new StringBuilder();
                 while ((line = reader.readLine()) != null) {
                     content.append(line).append(System.lineSeparator());
                 }
-                String json = content.toString();
+                String json = content.toString().trim();
+                if (json.equals("")) {
+                    return null;
+                }
                 Object result = gson.fromJson(json, Object.class);
                 if (result instanceof Double && !json.contains("."))
                     result = (int) (double) result;

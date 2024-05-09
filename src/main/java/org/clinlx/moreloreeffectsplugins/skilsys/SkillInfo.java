@@ -8,6 +8,7 @@ import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.clinlx.moreloreeffectsplugins.MoreLoreEffectsPlugin;
 import org.clinlx.moreloreeffectsplugins.skilsys.luaj.SkillThread;
+import org.luaj.vm2.LuaTable;
 
 public class SkillInfo {
     public static void setName(SkillInfo skillInfo, String name) {
@@ -38,7 +39,7 @@ public class SkillInfo {
         this.skillCode = skillCode;
     }
 
-    public void invoke(String playerName, boolean changeCoolDown) {
+    public void invoke(String playerName, boolean changeCoolDown, String invokeMode, LuaTable args) {
         Player player = Bukkit.getPlayer(playerName);
         if (player == null) return;
         if (!player.isOnline()) return;
@@ -47,8 +48,11 @@ public class SkillInfo {
             return;
         }
         if (skillCode != null) {
+            // 确保存在参数
+            if (args == null) args = new LuaTable();
+            args.set("InvokeMode", invokeMode);
             // 执行Lua代码
-            SkillThread.UseLuaSkill(playerName, player.getInventory().getItemInMainHand(), this, changeCoolDown);
+            SkillThread.UseLuaSkill(playerName, player.getInventory().getItemInMainHand(), this, changeCoolDown, args);
         } else {
             if (skillEffect == null) {
                 player.sendMessage("§c§l技能效果为空!");
@@ -79,7 +83,7 @@ public class SkillInfo {
 
     public boolean tryUseOnceBy(String playerName) {
         if (getCoolDownInfo(playerName).skillTypeReady()) {
-            invoke(playerName, true);
+            invoke(playerName, true, "Debug", null);
             return true;
         }
         return false;
