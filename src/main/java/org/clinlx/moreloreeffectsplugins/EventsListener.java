@@ -242,8 +242,10 @@ public class EventsListener implements Listener {
                             if (skillInfo.getCoolDownInfo(playerName).skillTypeReady()) {
                                 //触发技能
                                 skillInfo.invoke(playerName, true, "Attack", null);
-                                //TODO: 增加字段，触发时是否提醒
-                                player.sendMessage("触发攻击特效[§e" + skillName + "§r]");
+                                //触发时是否提醒
+                                String msg = "触发攻击特效[§e" + skillName + "§r]";
+                                if (!skillInfo.noInformWhenInvoke)
+                                    player.sendMessage(msg);
                             } else {
                                 //技能在CD
                                 if (System.currentTimeMillis() - skillInfo.getCoolDownInfo(playerName).getLastUseTime() >= 10
@@ -449,8 +451,10 @@ public class EventsListener implements Listener {
                     if (skillInfo.getCoolDownInfo(playerName).skillTypeReady()) {
                         //触发技能
                         skillInfo.invoke(playerName, true, (readyConsume ? "Consume" : "Skill"), null);
-                        //TODO: 增加字段，触发时是否提醒
-                        player.sendMessage("触发" + (readyConsume ? "消耗" : "") + "技能[§e" + skillName + "§r]");
+                        //触发时是否提醒
+                        String msg = "触发" + (readyConsume ? "消耗" : "") + "技能[§e" + skillName + "§r]";
+                        if (!skillInfo.noInformWhenInvoke)
+                            player.sendMessage(msg);
                     } else {
                         //技能在CD
                         if (System.currentTimeMillis() - skillInfo.getCoolDownInfo(playerName).getLastUseTime() >= 10

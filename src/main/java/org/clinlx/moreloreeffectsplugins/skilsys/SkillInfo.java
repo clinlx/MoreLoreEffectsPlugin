@@ -15,6 +15,16 @@ public class SkillInfo {
         skillInfo.skillName = name;
     }
 
+    public SkillInfo() {
+        // 无参构造函数
+        skillCoolDown = -1;
+        skillInformation = "管理员很懒，没有留下描述";
+        echoCoolDownLeftInform = true;
+        adminOnly = false;
+        cancelMouseButton = false;
+        noInformWhenInvoke = false;
+    }
+
     public SkillInfo(String skillName, String skillType) {
         this.skillName = skillName;
         this.skillType = skillType;
@@ -109,7 +119,9 @@ public class SkillInfo {
     @Expose
     public boolean adminOnly = false;
     @Expose
-    public boolean cancelMouseButton = true;
+    public boolean cancelMouseButton = false;
+    @Expose
+    public boolean noInformWhenInvoke = false;
     @Expose
     public String skillEffect = null;
     public SkillCode skillCode = null;
