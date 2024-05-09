@@ -1,3 +1,13 @@
+Server:SetSaveData("Key",11)
+ -- 根据Key，在服务器的硬盘上永久存储数据，根据Key来存取
+ -- 该数据存储在服务器空间，全服务器共享，支持数字和字符串
+
+Server:GetSaveData("Key")
+ -- 根据Key，获取对应Key在服务器空间存储的数据,返回此数据
+
+Server:AddSaveData("Key",-1)
+ -- 根据Key，对服务器空间的数据进行自增，并且返回增加后的数据
+
 Server:Log("")
  -- 在服务器控制台打出日志
 
@@ -33,6 +43,16 @@ Skill:SetCoolDown(millisecond)
 
 Skill:SetTypeCoolDown("typeName",millisecond)
  -- 使用类型名来设置某一类技能的冷却时间(就是让该技能进入冷却)
+
+Player:SetSaveData("Key",11)
+ -- 根据Key，在服务器的硬盘上永久存储数据，根据Key来存取
+ -- 该数据存储在玩家数据空间，每个玩家独享自己的变量数据空间
+
+Player:GetSaveData("Key")
+ -- 根据Key，获取对应Key在玩家数据空间存储的数据,返回此数据
+
+Player:AddSaveData("Key",-1)
+ -- 根据Key，对玩家数据空间的数据进行自增，并且返回增加后的数据 
 
 Player:Inform("")
  -- 给玩家发消息

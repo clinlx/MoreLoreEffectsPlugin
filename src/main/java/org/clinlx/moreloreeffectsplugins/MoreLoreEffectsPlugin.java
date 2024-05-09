@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.clinlx.moreloreeffectsplugins.commands.*;
 import org.clinlx.moreloreeffectsplugins.skilsys.SkillData;
+import org.clinlx.moreloreeffectsplugins.skilsys.luaj.JsePlatformCopy;
+import org.clinlx.moreloreeffectsplugins.skilsys.luaj.SkillThread;
 
 import java.util.Random;
 
@@ -42,6 +44,9 @@ public final class MoreLoreEffectsPlugin extends JavaPlugin {
         EventsListener damageEventListener = new EventsListener(this);
         Bukkit.getPluginManager().registerEvents(damageEventListener, this);
         printLog("更多Lore词条插件启动，版本：" + getDescription().getVersion());
+        JsePlatformCopy.getGlobals().load("test = nil").call();
+        SkillThread.getThreadNum();
+        printLog("更多Lore词条Lua运行时初始化完成。");
     }
 
     @Override

@@ -21,6 +21,7 @@ import org.bukkit.inventory.ItemStack;
 import org.clinlx.moreloreeffectsplugins.skilsys.CoolDownInfo;
 import org.clinlx.moreloreeffectsplugins.skilsys.SkillInfo;
 import org.clinlx.moreloreeffectsplugins.skilsys.luaj.SkillThread;
+import org.luaj.vm2.LuaTable;
 
 import java.util.List;
 
@@ -105,6 +106,8 @@ public class EventsListener implements Listener {
         //获取信息
         Entity damagerEntity = event.getDamager();
         Entity targetEntity = event.getEntity();
+        //Temp
+        SkillInfo needInvokeSkill = null;
         //攻击者为类人
         if (damagerEntity instanceof HumanEntity) {
             //转换攻击者类人对象
@@ -241,7 +244,7 @@ public class EventsListener implements Listener {
                             //确认技能CD
                             if (skillInfo.getCoolDownInfo(playerName).skillTypeReady()) {
                                 //触发技能
-                                skillInfo.invoke(playerName, true, "Attack", null);
+                                needInvokeSkill = skillInfo;
                                 //触发时是否提醒
                                 String msg = "触发攻击特效[§e" + skillName + "§r]";
                                 if (!skillInfo.noInformWhenInvoke)
@@ -267,6 +270,7 @@ public class EventsListener implements Listener {
                 }
             }
         }
+        double expectDmg = newDmg;
         //受击者为类人
         if (targetEntity instanceof HumanEntity) {
             //转换受击者类人对象
@@ -306,6 +310,24 @@ public class EventsListener implements Listener {
         //确保伤害合法
         if (newDmg <= 0) {
             newDmg = 0;
+        }
+        if (needInvokeSkill != null) {
+            Player player = (Player) damagerEntity;
+            LivingEntity targetLiving = (LivingEntity) targetEntity;
+            LuaTable args = new LuaTable();
+            args.set("ExpectAttackDamage", expectDmg);
+            args.set("FinalAttackDamage", newDmg);
+            args.set("TargetEntityName", targetLiving.getName());
+            args.set("TargetEntityId", targetLiving.getEntityId());
+            args.set("TargetEntityPosX", targetLiving.getLocation().getX());
+            args.set("TargetEntityPosY", targetLiving.getLocation().getY());
+            args.set("TargetEntityPosZ", targetLiving.getLocation().getZ());
+            args.set("TargetEntityHeight", targetLiving.getHeight());
+            args.set("TargetEntityWidth", targetLiving.getWidth());
+            args.set("TargetEntityHealth", targetLiving.getHealth());
+            args.set("TargetEntityMaxHealth", targetLiving.getAttribute(GENERIC_MAX_HEALTH).getValue());
+            //args.set("TargetEntityUniqueId", targetEntity.getUniqueId().toString());
+            needInvokeSkill.invoke(player.getName(), true, "Attack", args);
         }
         //设置伤害
         event.setDamage(newDmg);
