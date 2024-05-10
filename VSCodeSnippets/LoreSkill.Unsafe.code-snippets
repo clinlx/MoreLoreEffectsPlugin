@@ -1,13 +1,17 @@
 {
     "LoreSkill.UnSafe": {
-       "prefix": ["UnSafe"],
+        "prefix": [
+            "UnSafe"
+        ],
         "body": [
             "UnSafe"
         ],
         "scope": "lua"
     },
     "LoreSkill.Unsafe:RunTask": {
-       "prefix": ["Unsafe:RunTask()"],
+        "prefix": [
+            "Unsafe:RunTask()"
+        ],
         "body": [
             "Unsafe:RunTask(function(Api)",
             "   ${1:-- body}",
@@ -16,7 +20,9 @@
         "scope": "lua"
     },
     "LoreSkill.Unsafe:RunTaskWithRes": {
-       "prefix": ["Unsafe:RunTaskWithRes()"],
+        "prefix": [
+            "Unsafe:RunTaskWithRes()"
+        ],
         "body": [
             "Unsafe:RunTaskWithRes(function(Api)",
             "   ${1:-- body}",
@@ -24,5 +30,4 @@
         ],
         "scope": "lua"
     },
-    
 }

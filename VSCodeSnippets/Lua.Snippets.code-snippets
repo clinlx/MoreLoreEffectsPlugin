@@ -1,6 +1,8 @@
 {
     "LoreSkill.ItemSnippets": {
-        "prefix": ["Snippets.Item"],
+        "prefix": [
+            "Snippets.Item"
+        ],
         "body": [
             "\"LoreSkill.${1:Item}\": {",
             "   \"prefix\": [\"${1:Item}\"],",
@@ -13,7 +15,9 @@
         "scope": "snippets"
     },
     "LoreSkill.HeadSnippets": {
-        "prefix": ["Snippets.Head"],
+        "prefix": [
+            "Snippets.Head"
+        ],
         "body": [
             "\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$1.$2/i}\": {",
             "   \"prefix\": [\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}\"],",
@@ -26,7 +30,9 @@
         "scope": "snippets"
     },
     "LoreSkill.BaseVarSnippets": {
-        "prefix": ["Snippets.Var"],
+        "prefix": [
+            "Snippets.Var"
+        ],
         "body": [
             "\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$1.$2/i}.${1:Name}\": {",
             "   \"prefix\": [\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}.${1:Name}\"],",
@@ -39,7 +45,9 @@
         "scope": "snippets"
     },
     "LoreSkill.BaseFuncSnippets": {
-        "prefix": ["Snippets.Func"],
+        "prefix": [
+            "Snippets.Func"
+        ],
         "body": [
             "\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$1.$2/i}:${1:Name}\": {",
             "   \"prefix\": [\"${TM_FILENAME/(.*)\\.(.*)\\.code-snippets/$2/i}:${1:Name}()\"],",

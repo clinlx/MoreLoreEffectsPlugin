@@ -1,0 +1,119 @@
+{
+    "LoreSkill.Args": {
+        "prefix": [
+            "Args"
+        ],
+        "body": [
+            "Args"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.InvokeMode": {
+        "prefix": [
+            "Args.InvokeMode"
+        ],
+        "body": [
+            "Args.InvokeMode$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.ExpectAttackDamage": {
+        "prefix": [
+            "Args.ExpectAttackDamage"
+        ],
+        "body": [
+            "Args.ExpectAttackDamage$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.FinalAttackDamage": {
+        "prefix": [
+            "Args.FinalAttackDamage"
+        ],
+        "body": [
+            "Args.FinalAttackDamage$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityName": {
+        "prefix": [
+            "Args.TargetEntityName"
+        ],
+        "body": [
+            "Args.TargetEntityName$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityId": {
+        "prefix": [
+            "Args.TargetEntityId"
+        ],
+        "body": [
+            "Args.TargetEntityId$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityPosX": {
+        "prefix": [
+            "Args.TargetEntityPosX"
+        ],
+        "body": [
+            "Args.TargetEntityPosX$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityPosY": {
+        "prefix": [
+            "Args.TargetEntityPosY"
+        ],
+        "body": [
+            "Args.TargetEntityPosY$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityPosZ": {
+        "prefix": [
+            "Args.TargetEntityPosZ"
+        ],
+        "body": [
+            "Args.TargetEntityPosZ$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityHeight": {
+        "prefix": [
+            "Args.TargetEntityHeight"
+        ],
+        "body": [
+            "Args.TargetEntityHeight$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityWidth": {
+        "prefix": [
+            "Args.TargetEntityWidth"
+        ],
+        "body": [
+            "Args.TargetEntityWidth$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityHealth": {
+        "prefix": [
+            "Args.TargetEntityHealth"
+        ],
+        "body": [
+            "Args.TargetEntityHealth$0"
+        ],
+        "scope": "lua"
+    },
+    "LoreSkill.Args.TargetEntityMaxHealth": {
+        "prefix": [
+            "Args.TargetEntityMaxHealth"
+        ],
+        "body": [
+            "Args.TargetEntityMaxHealth$0"
+        ],
+        "scope": "lua"
+    },
+}

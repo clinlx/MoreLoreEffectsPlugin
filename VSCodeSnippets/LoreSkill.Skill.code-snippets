@@ -1,27 +1,35 @@
 {
     "LoreSkill.Skill": {
-       "prefix": ["Skill"],
+        "prefix": [
+            "Skill"
+        ],
         "body": [
             "Skill"
         ],
         "scope": "lua"
     },
     "LoreSkill.Skill:getDefCd": {
-       "prefix": ["Skill:getDefCd()"],
+        "prefix": [
+            "Skill:getDefCd()"
+        ],
         "body": [
             "Skill:getDefCd()$0"
         ],
         "scope": "lua"
     },
     "LoreSkill.Skill:SetCoolDown": {
-       "prefix": ["Skill:SetCoolDown()"],
+        "prefix": [
+            "Skill:SetCoolDown()"
+        ],
         "body": [
             "Skill:SetCoolDown(${1:millisecond})$0"
         ],
         "scope": "lua"
     },
     "LoreSkill.Skill:SetTypeCoolDown": {
-       "prefix": ["Skill:SetTypeCoolDown()"],
+        "prefix": [
+            "Skill:SetTypeCoolDown()"
+        ],
         "body": [
             "Skill:SetTypeCoolDown(${1:typeName},${2:millisecond})$0"
         ],
